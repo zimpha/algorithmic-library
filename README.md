@@ -80,6 +80,7 @@ Collections of some commonly used algorithms.
 + [ ] link-cut-tree
 + [ ] Top Tree
 + [ ] Euler Tour Tree
++ [ ] k-d Tree
 
 ## Computational Geometry
 
@@ -96,17 +97,19 @@ Collections of some commonly used algorithms.
 
 ## Mathematics
 
-+ [ ] 基本数论算法
-+ [ ] 逆元相关
-+ [ ] 素数相关
-+ [ ] 积性函数
-+ [ ] 快速素数计数
++ [x] 基本数论算法
++ [x] 逆元相关
++ [x] 素数相关
++ [x] 线性筛相关
++ [x] 快速素数计数
 + [ ] 原根
 + [ ] 平方剩余
++ [ ] 立方剩余
++ [ ] N次剩余
 + [ ] 离散对数
-+ [ ] 佩尔方程
-+ [ ] 同余方程
-+ [ ] 同余方程组
++ [ ] 佩尔方程/二元二次不定方程
++ [x] 同余方程
++ [x] 同余方程组
 + [ ] 定积分计算
   + [ ] Romberg
   + [ ] 变步长Simpson
@@ -120,11 +123,14 @@ Collections of some commonly used algorithms.
 + [ ] 高斯消元
 + [ ] 勾股数对
 + [ ] 单纯型
++ [ ] 组合数取模
++ [x] 多项式插值
 
 ## Other Useful Tools
 
 + [ ] 快速读入
 + [ ] 分数类
++ [ ] 矩阵类
 + [ ] ModInt
 + [ ] 大整数类
 + [ ] 日期相关
