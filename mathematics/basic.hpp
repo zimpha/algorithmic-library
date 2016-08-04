@@ -3,7 +3,7 @@ typedef long long LL;
 
 LL mul_mod(LL a, LL n, LL m) {
   LL res = 0;
-  for (a % m; n; n >>= 1) {
+  for (a %= m; n; n >>= 1) {
     if (n & 1) res = (res + a) % m;
     a = (a + a) % m;
   }
@@ -16,7 +16,7 @@ inline LL add_mod(LL x, LL y) {
 
 LL pow_mod(LL a, LL n, LL m) {
   LL res = 1;
-  for (a % m; n; n >>= 1) {
+  for (a %= m; n; n >>= 1) {
     if (n & 1) res = res * a % m;
     a = a * a % m;
   }
@@ -27,7 +27,7 @@ LL pow_mod(LL a, LL n, LL m) {
 // 条件允许的话使用__int128会比较快
 LL pow_mod_LL(LL a, LL n, LL m) {
   LL res = 1;
-  for (a % m; n; n >>= 1) {
+  for (a %= m; n; n >>= 1) {
     if (n & 1) res = mul_mod(res, a, m);
     a = mul_mod(a, a, m);
   }

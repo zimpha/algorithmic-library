@@ -6,7 +6,7 @@ Collections of some commonly used algorithms.
 + [x] 扩展KMP
 + [x] 最小表示法
 + [x] manacher
-+ [ ] 字符串hash
++ [x] 字符串hash
 + [ ] EERTREE
 + [ ] 后缀数组
   + [x] 倍增
@@ -23,7 +23,7 @@ Collections of some commonly used algorithms.
 
 ## Graph Algorithms
 
-+ [ ] 拓扑排序
++ [x] 拓扑排序
 + [ ] 最短路
   + [ ] Floyd
   + [ ] Bellman-Ford
@@ -102,12 +102,12 @@ Collections of some commonly used algorithms.
 + [x] 素数相关
 + [x] 线性筛相关
 + [x] 快速素数计数
-+ [ ] 原根
-+ [ ] 平方剩余
++ [x] 原根
++ [x] 平方剩余
 + [ ] 立方剩余
 + [ ] N次剩余
-+ [ ] 离散对数
-+ [ ] 佩尔方程/二元二次不定方程
++ [x] 离散对数
++ [x] 佩尔方程/二元二次不定方程
 + [x] 同余方程
 + [x] 同余方程组
 + [ ] 定积分计算
@@ -116,26 +116,26 @@ Collections of some commonly used algorithms.
   + [ ] 自适应Simpson
 + [ ] 线性基
 + [ ] 康托展开
-+ [ ] 行列式求模
++ [x] 行列式求模
 + [ ] 快速傅里叶变换
 + [ ] 快速数论变换
 + [ ] Fibonacci数
 + [ ] 高斯消元
-+ [ ] 勾股数对
++ [x] 勾股数对
 + [ ] 单纯型
 + [ ] 组合数取模
 + [x] 多项式插值
 
 ## Other Useful Tools
 
-+ [ ] 快速读入
-+ [ ] 分数类
++ [x] 快速读入
++ [x] 分数类
 + [ ] 矩阵类
-+ [ ] ModInt
++ [x] ModInt
 + [ ] 大整数类
 + [ ] 日期相关
 + [ ] Fast Walsh–Hadamard transform
 + [ ] 完全单调性
-+ [ ] Frobenius Equations
-+ [ ] 最长上升子序列
++ [x] Frobenius Equations
++ [x] 最长上升子序列
 + [ ] Stern–Brocot tree
