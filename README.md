@@ -7,7 +7,7 @@ Collections of some commonly used algorithms.
 + [x] 最小表示法
 + [x] manacher
 + [x] 字符串hash
-+ [ ] EERTREE
++ [x] EERTREE
 + [ ] 后缀数组
   + [x] 倍增
   + [x] SA-IS
@@ -57,7 +57,8 @@ Collections of some commonly used algorithms.
 + [ ] 最近公共祖先
 + [ ] Prüfer序列
 + [ ] 最大团
-+ [ ] 全局最小割
++ [x] 全局最小割
++ [ ] Gomory-Hu tree
 + [ ] 树hash
 + [ ] 树上最长路
 + [ ] Matrix Tree Theorem
@@ -66,11 +67,11 @@ Collections of some commonly used algorithms.
 ## Data Structures
 
 + [ ] easy segment tree
-+ [ ] 树状数组
++ [x] 树状数组
 + [x] ST表
-+ [ ] 并查集
++ [x] 并查集
 + [ ] 莫队算法
-+ [ ] 动态凸壳
++ [x] 动态凸壳
 + [ ] 树链剖分
 + [ ] 二叉堆
 + [ ] 左偏树
@@ -119,11 +120,11 @@ Collections of some commonly used algorithms.
 + [x] 行列式求模
 + [ ] 快速傅里叶变换
 + [ ] 快速数论变换
-+ [ ] Fibonacci数
-+ [ ] 高斯消元
++ [x] Fibonacci数
++ [x] 高斯消元
 + [x] 勾股数对
-+ [ ] 单纯型
-+ [ ] 组合数取模
++ [x] 单纯型
++ [x] 组合数取模
 + [x] 多项式插值
 
 ## Other Useful Tools
