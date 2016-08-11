@@ -21,8 +21,8 @@ namespace SuffixTree {
     int pos;
     position() {}
     position(node* u, int pos): u(u), pos(pos) {}
-    void go(int o) {u = u->go[o], pos -= u->len;}
-    bool can(int o) {return pos > u->go[o]->len;}
+    void go(int o) {u = u->go[o]; pos -= u->len;}
+    bool can(int o) {return u->go[o] && pos > u->go[o]->len;}
   } last;
   int s[SIZE], n;
   node *new_node(int st, int len) {
@@ -62,5 +62,13 @@ namespace SuffixTree {
       if (last.u == rt) --last.pos;
       else last.u = last.u->link ? last.u->link : rt;
     }
+  }
+  // count the number of distinct substrings
+  int count() {
+    int ret = 0;
+    for (int i = 1; i < sz - pool; ++i) {
+      ret += std::min(n - pool[i].st, pool[i].len);
+    }
+    return ret;
   }
 }

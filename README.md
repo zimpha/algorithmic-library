@@ -13,7 +13,7 @@ Collections of some commonly used algorithms.
   + [x] SA-IS
   + [ ] DC3
   + [ ] GSACA
-+ [ ] 后缀树
++ [x] 后缀树
 + [x] 后缀自动机
 + [ ] 子序列自动机
 + [ ] AC自动机
