@@ -7,11 +7,14 @@
  *
  * time complexity: O(n)
  */
+#include <algorithm>
+
 namespace SA {
+const static int N = 100000 + 10;
 int sa[N], rk[N], ht[N], s[N<<1], t[N<<1], p[N], cnt[N], cur[N];
 #define pushS(x) sa[cur[s[x]]--] = x
 #define pushL(x) sa[cur[s[x]]++] = x
-#define inducedSort(v) fill_n(sa, n, -1); fill_n(cnt, m, 0);                \
+#define inducedSort(v) std::fill_n(sa, n, -1); std::fill_n(cnt, m, 0);      \
   for (int i = 0; i < n; i++) cnt[s[i]]++;                                  \
   for (int i = 1; i < m; i++) cnt[i] += cnt[i-1];                           \
   for (int i = 0; i < m; i++) cur[i] = cnt[i]-1;                            \
@@ -39,7 +42,7 @@ void sais(int n, int m, int *s, int *t, int *p) {
 template<typename T>
 int mapCharToInt(int n, const T *str) {
   int m = *max_element(str, str+n);
-  fill_n(rk, m+1, 0);
+  std::fill_n(rk, m+1, 0);
   for (int i = 0; i < n; i++) rk[str[i]] = 1;
   for (int i = 0; i < m; i++) rk[i+1] += rk[i];
   for (int i = 0; i < n; i++) s[i] = rk[str[i]] - 1;

@@ -8,18 +8,17 @@ Collections of some commonly used algorithms.
 + [x] manacher
 + [x] 字符串hash
 + [x] EERTREE
-+ [ ] 后缀数组
-  + [x] 倍增
++ [x] 后缀数组
+  + [x] Prefix Doubling
   + [x] SA-IS
-  + [ ] DC3
-  + [ ] GSACA
 + [x] 后缀树
 + [x] 后缀自动机
-+ [ ] 子序列自动机
++ [x] 子序列自动机
 + [ ] AC自动机
 + [x] Palindromic Factorization
 + [x] Lyndon Word Factorization
 + [ ] Square Factorization
++ [x] Lempel-Ziv Factorization
 + [ ] Repetitions
 
 ## Graph Algorithms
