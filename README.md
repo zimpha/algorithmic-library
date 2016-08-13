@@ -20,6 +20,8 @@ Collections of some commonly used algorithms.
 + [ ] Square Factorization
 + [x] Lempel-Ziv Factorization
 + [ ] Repetitions
++ [x] CLCS
++ [x] bit-LCS
 
 ## Graph Algorithms
 
@@ -140,3 +142,4 @@ Collections of some commonly used algorithms.
 + [x] Frobenius Equations
 + [x] 最长上升子序列
 + [ ] Stern–Brocot tree
++ [ ] 直线下格点
