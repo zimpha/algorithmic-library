@@ -14,7 +14,7 @@ Collections of some commonly used algorithms.
 + [x] 后缀树
 + [x] 后缀自动机
 + [x] 子序列自动机
-+ [ ] AC自动机
++ [x] AC自动机
 + [x] Palindromic Factorization
 + [x] Lyndon Word Factorization
 + [ ] Square Factorization
