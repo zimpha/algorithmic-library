@@ -1,12 +1,15 @@
 #include <bits/stdc++.h>
 typedef long long LL;
 
-LL mul_mod(LL a, LL n, LL m) {
-  LL res = 0;
-  for (a %= m; n; n >>= 1) {
-    if (n & 1) res = (res + a) % m;
-    a = (a + a) % m;
-  }
+// mod should be not greater than 4e18
+inline LL mul_mod(LL a, LL b, LL mod) {
+  assert(0 <= a && a < mod);
+  assert(0 <= b && b < mod);
+  if (mod < int(1e9)) return a * b % mod;
+  LL k = (LL)((long double)a * b / mod);
+  LL res = a * b - k * mod;
+  res %= mod;
+  if (res < 0) res += mod;
   return res;
 }
 
