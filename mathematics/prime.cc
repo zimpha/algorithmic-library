@@ -7,7 +7,7 @@ public:
     if (n <= 1) return false;
     if (n <= 3) return true;
     if (~n & 1) return false;
-    const int u[] = {2,325,9375,28178,450775,9780504,1795265022,0};
+    const int u[] = {2,3,5,7,325,9375,28178,450775,9780504,1795265022,0};
     LL e = n - 1, a, c = 0; // 原理：http://miller-rabin.appspot.com/
     while (~e & 1) e >>= 1, ++c;
     for (int i = 0; u[i]; ++i) {

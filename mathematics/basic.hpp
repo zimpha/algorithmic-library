@@ -55,7 +55,7 @@ void exgcd(LL a, LL b, LL &g, LL &x, LL &y) {
 LL mod_inv(LL a, LL m) {
   LL d, x, y;
   exgcd(a, m, d, x, y);
-  return d == 1 ? (x % + m) % m : -1;
+  return d == 1 ? (x % m + m) % m : -1;
 }
 
 //ax + by = c,x >= 0, x is minimum

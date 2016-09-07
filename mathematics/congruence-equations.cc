@@ -1,14 +1,14 @@
 #include "basic.hpp"
 
 // 中国剩余定理， 要求m[i]互质
-// x = a[i] (mod m[i]) (0 <= i < n)
+// x = c[i] (mod m[i]) (0 <= i < n)
 LL crt(int n, LL *c, LL *m) {
   LL M = 1, ans = 0;
   for (int i = 0; i < n; ++i) M *= m[i];
   for (int i = 0; i < n; ++i) {
     LL x, y, g, tm = M / m[i];
     exgcd(tm, m[i], g, x, y);
-    ans = (ans + tm * x * a[i] % M) % M;
+    ans = (ans + tm * x * c[i] % M) % M;
   }
   return (ans + M) % M;
 }
