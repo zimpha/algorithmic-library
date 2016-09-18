@@ -7,15 +7,15 @@ bool test(LL g, LL n, LL phi, std::vector<LL> &u) {
   return true;
 }
 LL primitive_root(LL n) {
-  LL phi = euler_phi(n), m = n;
+  LL phi = euler_phi(n), m = phi;
   std::vector<LL> u;
-  for (LL i = 2; i * i <= m; ++i) if (n % i == 0) {
+  for (LL i = 2; i * i <= m; ++i) if (m % i == 0) {
     u.push_back(i);
-    while (n % i == 0) n /= i;
+    while (m % i == 0) m /= i;
   }
-  if (n > 1) u.push_back(n);
+  if (m > 1) u.push_back(m);
   for (int g = 1; ; ++g) {
-    if (test(g, m, phi, u)) return g;
+    if (test(g, n, phi, u)) return g;
   }
   return -1;
 }
