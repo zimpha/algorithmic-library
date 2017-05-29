@@ -1,15 +1,15 @@
-#include <bits/stdc++.h>
+#include <algorithm>
 
 struct KM {
   typedef long long cost_t;
-  static const int MAXN = 1000;
+  static const int N = 1000;
   static const cost_t inf = 1e9;
-  cost_t lx[MAXN], ly[MAXN], sl[MAXN];
-  int px[MAXN],py[MAXN],sy[MAXN],fa[MAXN],n;
+  cost_t lx[N], ly[N], sl[N];
+  int px[N],py[N],sy[N],fa[N],n;
   void aug(int v) {
     sy[v]=py[v]; if (px[sy[v]]!=-2) aug(px[sy[v]]);
   }
-  bool find(int v, const cost_t w[][MAXN]) {
+  bool find(int v, const cost_t w[][N]) {
     for (int i=0;i<n;++i) if (!~py[i]) {
       if (sl[i]>lx[v]+ly[i]-w[v][i]) {
         sl[i]=lx[v]+ly[i]-w[v][i]; fa[i] = v;
@@ -22,7 +22,7 @@ struct KM {
     }
     return 0;
   }
-  cost_t gao(int _n, const cost_t w[][MAXN], cost_t m=inf) {
+  cost_t gao(int _n, const cost_t w[][N], cost_t m=inf) {
     n=_n; std::fill(sy,sy+n,-1); std::fill(ly,ly+n,0);
     for (int i=0;i<n;++i) lx[i]=*std::max_element(w[i],w[i]+n);
     for (int i(0),flag;i<n;++i) {

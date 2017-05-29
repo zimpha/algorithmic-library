@@ -1,8 +1,11 @@
+#include <cstring>
+#include <vector>
+
 struct Tarjan {// index from 0 to n - 1
-  static const int MAXN = 100000 + 10;
-  std::vector<int> SCC[MAXN];
-  int low[MAXN], dfn[MAXN], col[MAXN];
-  int stk[MAXN], top, scc_cnt, sz;
+  static const int N = 100000 + 10;
+  std::vector<int> SCC[N];
+  int low[N], dfn[N], col[N];
+  int stk[N], top, scc_cnt, sz;
   void dfs(int x, const std::vector<int> G[]) {
     low[x] = dfn[x] = ++sz;
     stk[++top] = x;
@@ -25,8 +28,8 @@ struct Tarjan {// index from 0 to n - 1
   }
   void run(int n,const std::vector<int> G[]) {
     sz = top = scc_cnt = 0;
-    memset(dfn,  0, sizeof(dfn));
-    memset(col, -1, sizeof(col));
+    memset(dfn,  0, sizeof(*dfn) * n);
+    memset(col, -1, sizeof(*col) * n);
     for (int i = 0; i < n; ++i) {
       if (!dfn[i]) dfs(i,G);
     }

@@ -5,9 +5,11 @@
  * 返回一个pair, 表示绝对中心在这条边(s1, s2)上
  * ds1, ds2记录s1和s2距离绝对中心的距离, 按需返回
  **/
-const int MAXN = 1000, inf = 1e9;
+#include <algorithm>
 
-void floyd(int n, int g[][MAXN], int d[][MAXN]) {
+const int N = 1000, inf = 1e9;
+
+void floyd(int n, int g[][N], int d[][N]) {
   for (int i = 0; i < n; ++i) {
     for (int j = 0; j < n; ++j) {
       d[i][j] = g[i][j];
@@ -22,8 +24,8 @@ void floyd(int n, int g[][MAXN], int d[][MAXN]) {
   }
 }
 
-std::pair<int, int> KarivHakimi(int n, int g[][MAXN]) {
-  static int rk[MAXN][MAXN], d[MAXN][MAXN];
+std::pair<int, int> KarivHakimi(int n, int g[][N]) {
+  static int rk[N][N], d[N][N];
   double ds1 = 0, ds2 = 0;
   floyd(n, g, d);
   for (int i = 0; i < n; ++i) {

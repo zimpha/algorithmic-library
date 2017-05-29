@@ -25,11 +25,13 @@
  * 相反dom中节点u在原图G中的标号是pt[u]
  * 调用build得到以s为根的Dominator Tree
  **/
+#include <vector>
+
 namespace DominatorTree {
-  const static int MAXN = 100000 + 10;
+  const static int N = 100000 + 10;
   typedef std::vector<int> VI;
-  int dfn[MAXN], pre[MAXN], pt[MAXN], sz;
-  int semi[MAXN], dsu[MAXN], idom[MAXN], best[MAXN];
+  int dfn[N], pre[N], pt[N], sz;
+  int semi[N], dsu[N], idom[N], best[N];
   int get(int x) {
     if (x == dsu[x]) return x;
     int y = get(dsu[x]);

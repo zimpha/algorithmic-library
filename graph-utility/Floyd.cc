@@ -1,13 +1,15 @@
+#include <vector>
+
 template<typename T>
 struct Floyd {
-  static const int SIZE = 1000 + 10;
+  static const int N = 1000 + 10;
   std::vector<int> path;
-  T dis[SIZE][SIZE], res;
-  int src[SIZE][SIZE];
+  T dis[N][N], res;
+  int src[N][N];
   // 传入结点个数n及权值矩阵graph[][]，返回最小环的长度res，方案记在path中
   // 对于矩阵graph[][]中不存在的边，权值设为1e9+7或0x7F7F7F7F之类的极大值
   // 若最后的返回值大于等于1e9，则不存在最小环
-  T run(int n, const T graph[SIZE][SIZE]) {
+  T run(int n, const T graph[N][N]) {
     res = 1e9 + 7;
     for (int i = 0; i < n; ++i) {
       for (int j = 0; j < n; ++j) {

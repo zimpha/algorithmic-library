@@ -2,10 +2,10 @@
 class Articulation {
 public:
   typedef std::pair<int, int> PII;
-  static const int SIZE = 100005; // 最大结点个数
+  static const int N = 100005; // 最大结点个数
   std::vector<PII> keyE;               // keyE为割边集，keyV为割点集
-  std::vector<int> keyV, cc[SIZE];      // cc[p]表示结点p在哪些双连通分量中
-  int cnt;  // 对于旧版编译器，将上面cc[SIZE]改成vector的形式
+  std::vector<int> keyV, cc[N];      // cc[p]表示结点p在哪些双连通分量中
+  int cnt;  // 对于旧版编译器，将上面cc[N]改成vector的形式
   // 传入结点个数n及各结点的出边e[]，返回双连通分量的个数cnt
   int run(int n, const std::vector<int> G[]){
     memset(dfn, use = 0, sizeof(dfn[0]) * n);
@@ -18,7 +18,7 @@ public:
     return cnt;
   }
 private:
-  int dfn[SIZE], low[SIZE], dot[SIZE], use;
+  int dfn[N], low[N], dot[N], use;
   void dfs(int x, int dep, const std::vector<int> G[]){
     int src = 0, out = 1 < dep;
     dot[use++] = x;

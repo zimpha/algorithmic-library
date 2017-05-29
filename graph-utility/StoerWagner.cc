@@ -2,9 +2,9 @@
 #include <cstring>
 
 // global minimum-cut
-const int MAXN = 500 + 10, inf = 1e9;
-int stoer_wagner(int n, int G[][MAXN]) {
-  int dis[MAXN], idx[MAXN], vis[MAXN], ret = inf;
+const int N = 500 + 10, inf = 1e9;
+int stoer_wagner(int n, int G[][N]) {
+  int dis[N], idx[N], vis[N], ret = inf;
   for (int i = 0; i < n; ++ i) idx[i] = i;
   while (n > 1) {
     int t = 1, s = 0;

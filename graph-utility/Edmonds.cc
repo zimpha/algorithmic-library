@@ -3,13 +3,16 @@
 //传入图的大小n和邻接阵G[][], 不相邻点边权inf, 下标0~n-1
 //可更改边权的类型, pre[]返回树的构造, 用父结点表示
 //传入时pre[]数组清零, 用-1标出可能的源点
-const int MAXN = 1000 + 10, inf = 1e9;
-int edmonds(int n, int G[][MAXN], int pre[]) {
-  static int vis[MAXN][MAXN], l[MAXN], p[MAXN];
+#include <cstring>
+
+const int N = 1000 + 10, inf = 1e9;
+int edmonds(int n, int G[][N], int pre[]) {
+  static int vis[N][N], l[N], p[N];
   int m=n,cnt,ret=0;
   for (int i=0;i<n;++i) l[i]=i;
   do {
-    memset(vis,0,sizeof(vis)); memset(p,0xff,sizeof(p));
+    memset(vis,0,sizeof(vis));
+    memset(p,0xff,sizeof(p));
     cnt=m; for (int i=0;i<m;++i) vis[i][i]=1;
     for (int i=0;i<cnt;++i) if (l[i]==i&&pre[i]!=-1) {
       for (int j=0;j<m;++j) {

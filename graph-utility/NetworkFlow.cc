@@ -1,13 +1,16 @@
+#include <cstring>
+#include <algorithm>
+
 namespace NetFlow {
-  const int MAXN=100000,MAXM=100000,inf=1e9;
+  const int N=100000,MAXM=100000,inf=1e9;
   struct Edge {
     int v,c,f,nx;//c:capcity, f:flow
     Edge() {}
     Edge(int v,int c,int f,int nx):v(v),c(c),f(f),nx(nx) {}
   } E[MAXM];
-  int G[MAXN],cur[MAXN],pre[MAXN],dis[MAXN],gap[MAXN],N,sz;
+  int G[N],cur[N],pre[N],dis[N],gap[N],n,sz;
   void init(int _n) {
-    N=_n,sz=0; memset(G,-1,sizeof(G[0])*N);
+    n=_n,sz=0; memset(G,-1,sizeof(G[0])*n);
   }
   void link(int u,int v,int c) {
     E[sz]=Edge(v,c,0,G[u]); G[u]=sz++;
@@ -15,8 +18,8 @@ namespace NetFlow {
   }
   int ISAP(int S,int T) {//S -> T
     int maxflow=0,aug=inf,flag=false,u,v;
-    for (int i=0;i<N;++i)cur[i]=G[i],gap[i]=dis[i]=0;
-    for (gap[S]=N,u=pre[S]=S;dis[S]<N;flag=false) {
+    for (int i=0;i<n;++i)cur[i]=G[i],gap[i]=dis[i]=0;
+    for (gap[S]=n,u=pre[S]=S;dis[S]<n;flag=false) {
       for (int &it=cur[u];~it;it=E[it].nx) {
         if (E[it].c>E[it].f&&dis[u]==dis[v=E[it].v]+1) {
           if (aug>E[it].c-E[it].f) aug=E[it].c-E[it].f;
@@ -32,7 +35,7 @@ namespace NetFlow {
         }
       }
       if (flag) continue;
-      int mx=N;
+      int mx=n;
       for (int it=G[u];~it;it=E[it].nx) {
         if (E[it].c>E[it].f&&dis[E[it].v]<mx) {
           mx=dis[E[it].v]; cur[u]=it;
@@ -44,7 +47,7 @@ namespace NetFlow {
     return maxflow;
   }
   bool bfs(int S,int T) {
-    static int Q[MAXN]; memset(dis,-1,sizeof(dis[0])*N);
+    static int Q[N]; memset(dis,-1,sizeof(dis[0])*n);
     dis[S]=0; Q[0]=S;
     for (int h=0,t=1,u,v,it;h<t;++h) {
       for (u=Q[h],it=G[u];~it;it=E[it].nx) {
@@ -60,7 +63,7 @@ namespace NetFlow {
     int ret=0,tmp,v;
     for (int &it=cur[u];~it&&ret<low;it=E[it].nx) {
       if (dis[v=E[it].v]==dis[u]+1&&E[it].c>E[it].f) {
-        if (tmp=dfs(v,T,min(low-ret,E[it].c-E[it].f))) {
+        if (tmp=dfs(v,T,std::min(low-ret,E[it].c-E[it].f))) {
           ret+=tmp; E[it].f+=tmp; E[it^1].f-=tmp;
         }
       }
@@ -70,7 +73,7 @@ namespace NetFlow {
   int dinic(int S,int T) {
     int maxflow=0,tmp;
     while (bfs(S,T)) {
-      memcpy(cur,G,sizeof(G[0])*N);
+      memcpy(cur,G,sizeof(G[0])*n);
       while (tmp=dfs(S,T,inf)) maxflow+=tmp;
     }
     return maxflow;

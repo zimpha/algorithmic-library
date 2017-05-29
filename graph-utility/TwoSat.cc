@@ -2,10 +2,13 @@
 // 调用add_edge()添加边, 调用add_var()添加变量的初始值
 // 调用solve()求解2sat 如果有解存在mark中
 // 对于变量x, x*2表示x, x*2+1表示~x, mark[x*2]表示x的值
+#include <vector>
+#include <algorithm>
+
 struct TwoSAT {
-  static const int MAXN = 200000 + 10;
-  std::vector<int> G[MAXN];
-  int mark[MAXN], S[MAXN], sz, n;
+  static const int N = 200000 + 10;
+  std::vector<int> G[N];
+  int mark[N], S[N], sz, n;
   void init(int n) {
     this->n = n;
     for (int i = 0; i < n * 2; ++i) G[i].clear();
@@ -20,7 +23,7 @@ struct TwoSAT {
     return true;
   }
   bool solve() {
-    fill(mark, mark + 2 * n, 0);
+    std::fill(mark, mark + 2 * n, 0);
     for (int i = 0; i < n * 2; i += 2) {
       if (mark[i] || mark[i ^ 1]) continue;
       sz = 0;

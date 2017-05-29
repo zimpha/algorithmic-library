@@ -4,8 +4,8 @@
 
 class Blossom { // 复杂度O(n^3)
 public:
-  const static int MAXN=1000+10; // 最大结点个数 
-  int mate[MAXN],n,ret; // mate[]为配偶结点的编号，没有匹配上的点为-1
+  const static int N = 1000 + 10; // 最大结点个数 
+  int mate[N], n, ret; // mate[]为配偶结点的编号，没有匹配上的点为-1
   //传入结点个数n及各结点的出边G[], 返回匹配点对的数量ret
   int run(int n, const std::vector<int> G[]) {
     this->n = n;
@@ -15,7 +15,7 @@ public:
     return ret;
   }
 private:
-  int next[MAXN],dsu[MAXN],mark[MAXN],vis[MAXN];
+  int next[N],dsu[N],mark[N],vis[N];
   std::queue<int> Q;
   int get(int x) {return (x==dsu[x])?x:(dsu[x]=get(dsu[x]));}
   void merge(int a,int b) {dsu[get(a)]=get(b);}
