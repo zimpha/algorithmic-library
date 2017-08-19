@@ -1,32 +1,14 @@
+#include "basic.hpp"
 #include <cstdio>
 #include <cassert>
 #include <algorithm>
 
 namespace NTT {
-  using ll = long long;
-  const ll P = 2013265921, g = 31;
+  const int64 P = 2013265921, g = 31;
   //2113929217,5; 1811939329,13; 2130706433,3; 786433,10;
-  //1945555039024054273,5; 1231453023109121ll,3;
-  inline ll mul_mod(ll a, ll b, ll mod) {
-    assert(0 <= a && a < mod);
-    assert(0 <= b && b < mod);
-    if (mod < int(1e9)) return a * b % mod;
-    ll k = (ll)((long double)a * b / mod);
-    ll res = a * b - k * mod;
-    res %= mod;
-    if (res < 0) res += mod;
-    return res;
-  }
-  ll pow_mod(ll a, ll n, ll m) {
-    ll r = 1;
-    for (; n; n >>= 1) {
-      if (n & 1) r = mul_mod(r, a, m);
-      a = mul_mod(a, a, m);
-    }
-    return r;
-  }
-  void trans(ll a[], int n, bool inv = false) {
-    ll w = 1, d = pow_mod(g, (P - 1) / n, P), t;
+  //1945555039024054273,5; 1231453023109121int64,3;
+  void trans(int64 a[], int n, bool inv = false) {
+    int64 w = 1, d = pow_mod(g, (P - 1) / n, P), t;
     int i, j, c, s;
     if (inv) {
       for (i = 1, j = n - 1; i < j; std::swap(a[i++], a[j--]));

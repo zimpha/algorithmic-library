@@ -1,4 +1,8 @@
 #include "basic.hpp"
+#include <vector>
+#include <cmath>
+
+using std::size_t;
 
 std::vector<int> pl, phi, mp;
 void fast_sieve(int n) {
@@ -20,8 +24,8 @@ void fast_sieve(int n) {
   }
 }
 
-std::vector<LL> factorize(LL n){
-  std::vector<LL> u;
+std::vector<int64> factorize(int64 n){
+  std::vector<int64> u;
   for (int i = 0, t = sqrt(n + 1); pl[i] <= t; ++i) if (n % pl[i] == 0) {
     while (n % pl[i] == 0) {
       n /= pl[i];
