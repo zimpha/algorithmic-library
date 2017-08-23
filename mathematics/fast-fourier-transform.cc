@@ -15,6 +15,12 @@ namespace fft {
     Complex operator - (const Complex& r) const {
       return Complex(x - r.x , y - r.y);
     }
+    Complex operator * (const double k) const {
+      return Complex(x * k, y * k);
+    }
+    Complex operator / (const double k) const {
+      return Complex(x / k, y / k);
+    }
     Complex operator * (const Complex& r) const {
       return Complex(x * r.x - y * r.y , x * r.y + y * r.x);
     }
@@ -54,9 +60,14 @@ namespace fft {
         }
       }
     }
+    if (oper == -1) {
+      for (int i = 0; i < n; ++i) {
+        P[i] = P[i] / n;
+      }
+    }
   }
   Complex A[N] , B[N] , C1[N] , C2[N];
-  std::vector<int> conv(const std::vector<int> &a, const std::vector<int> &b) {
+  std::vector<int64> conv(const std::vector<int> &a, const std::vector<int> &b) {
     int n = a.size(), m = b.size(), s = 1;
     while (s <= n + m - 2) s <<= 1;
     init(s);
@@ -69,8 +80,11 @@ namespace fft {
     for (int i = 0; i < s; ++i) {
       A[i] = A[i] * B[i];
     }
+    for (int i = 0; i < s; ++i) {
+      w[i] = w[i].conj();
+    }
     trans(A, s, -1);
-    std::vector<int> res(n + m - 1);
+    std::vector<int64> res(n + m - 1);
     for (int i = 0; i < s; ++i) {
       res[i] = (int64)(A[i].x + 0.5);
     }
@@ -101,10 +115,10 @@ namespace fft {
     trans(C1, s, -1);
     trans(C2, s, -1);
     for (int i = 0 ; i < n + m - 1; ++i) {
-      int x = (int64)(C1[i].x / s + 0.5) % mod;
-      int y1 = (int64)(C1[i].y / s + 0.5) % mod;
-      int y2 = (int64)(C2[i].x / s + 0.5) % mod;
-      int z = (int64)(C2[i].y / s + 0.5) % mod;
+      int x = int64(C1[i].x + 0.5) % mod;
+      int y1 = int64(C1[i].y + 0.5) % mod;
+      int y2 = int64(C2[i].x + 0.5) % mod;
+      int z = int64(C2[i].y + 0.5) % mod;
       res[i] = ((int64)x * M * M + (int64)(y1 + y2) * M + z) % mod;
     }
   }
