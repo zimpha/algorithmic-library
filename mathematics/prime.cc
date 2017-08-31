@@ -5,13 +5,13 @@
 
 struct Primality {
 public:
-  // 用miint64er rabin素数测试判断n是否为质数
+  // 用miller rabin素数测试判断n是否为质数
   bool is_prime(int64 n) {
     if (n <= 1) return false;
     if (n <= 3) return true;
     if (~n & 1) return false;
     const int u[] = {2,3,5,7,325,9375,28178,450775,9780504,1795265022,0};
-    int64 e = n - 1, a, c = 0; // 原理：http://miint64er-rabin.appspot.com/
+    int64 e = n - 1, a, c = 0; // 原理：http://miller-rabin.appspot.com/
     while (~e & 1) e >>= 1, ++c;
     for (int i = 0; u[i]; ++i) {
       if (n <= u[i]) return true;

@@ -6,13 +6,13 @@
  * time complexity: O(nm/w)
  **/
 #include <bits/stdc++.h>
-typedef long long LL;
+typedef long long int64;
 
 const int MAXN = 2000 + 10, SIGMA = 26;
 const int W = 62;
 int M = 33;
 struct Bitset {
-  LL u[34];
+  int64 u[34];
   void clr() {
     memset(u, 0, sizeof(u));
   }
@@ -38,7 +38,7 @@ struct Bitset {
     }
   }
   void shl() {
-    for (LL i = 0, c(1); i < M; ++ i) {
+    for (int64 i = 0, c(1); i < M; ++ i) {
       u[i] <<= 1; u[i] |= c;
       c = u[i] >> W & 1;
       u[i] ^= c << W;
