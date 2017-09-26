@@ -35,12 +35,12 @@ namespace fft {
   const double pi = acos(-1.0);
   Complex w[N];
   int rev[N];
-  void init(int n) {
-    int LN = __builtin_ctz(n);
+  void init(int L) {
+    int n = 1 << L;
     for (int i = 0 ; i < n ; ++ i) {
       double ang = 2 * pi * i / n;
       w[i] = Complex(cos(ang) , sin(ang));
-      rev[i] = (rev[i >> 1] >> 1) | ((i & 1) << (LN - 1));
+      rev[i] = (rev[i >> 1] >> 1) | ((i & 1) << (L - 1));
     }
   }
   void trans(Complex P[], int n, int oper) {
@@ -68,9 +68,9 @@ namespace fft {
   }
   Complex A[N] , B[N] , C1[N] , C2[N];
   std::vector<int64> conv(const std::vector<int> &a, const std::vector<int> &b) {
-    int n = a.size(), m = b.size(), s = 1;
-    while (s <= n + m - 2) s <<= 1;
-    init(s);
+    int n = a.size(), m = b.size(), L = 0, s = 1;
+    while (s <= n + m - 2) s <<= 1, ++L;
+    init(L);
     for (int i = 0; i < s; ++i) {
       A[i] = i < n ? Complex(a[i], 0) : Complex();
       B[i] = i < m ? Complex(b[i], 0) : Complex();
@@ -90,17 +90,41 @@ namespace fft {
     }
     return res;
   }
+  std::vector<int64> fast_conv(const std::vector<int> &a, const std::vector<int> &b) {
+    int n = a.size(), m = b.size(), L = 0, s = 1;
+    for (; s <= n + m - 2; s <<= 1, ++L);
+    s >>= 1, --L;
+    init(L);
+    for (int i = 0; i < s; ++i) {
+      A[i].x = (i << 1) < n ? a[i << 1] : 0;
+      A[i].y = (i << 1 | 1) < n ? a[i << 1 | 1] : 0;
+      B[i].x = (i << 1) <  m ? b[i << 1] : 0;
+      B[i].y = (i << 1 | 1) < m ? b[i << 1 | 1] : 0;
+    }
+    trans(A, s, 1); trans(B, s, 1);
+    for (int i = 0; i < s; ++i) {
+      int j = (s - i) & (s - 1);
+      A[i] = (Complex(4, 0) * (A[j] * B[j]).conj() - (A[j].conj() - A[i]) * (B[j].conj() - B[i]) * (w[i] + Complex(1, 0))) * Complex(0, 0.25);
+    }
+    std::reverse(w + 1, w + s);
+    trans(A, s, -1);
+    std::vector<int64> res(n + m - 1);
+    for (int i = 0; i <= (n + m - 1) / 2; ++i) {
+      res[i << 1] = int64(A[i].y + 0.5);
+      res[i << 1 | 1] = int64(A[i].x + 0.5);
+    }
+    return res;
+  }
   // arbitrary modulo convolution
   void conv(int a[], int b[], int n, int m, int mod, int res[]) {
-    int s = 1;
-    while (s <= n + m - 2) s <<= 1;
-    init(s);
+    int s = 1, L = 0;
+    while (s <= n + m - 2) s <<= 1, ++L;
+    init(L);
     for (int i = 0; i < s; ++i) {
       A[i] = i < n ? Complex(a[i] / M, a[i] % M) : Complex();
       B[i] = i < m ? Complex(b[i] / M, b[i] % M) : Complex();
     }
-    trans(A, s, 1);
-    trans(B, s, 1);
+    trans(A, s, 1); trans(B, s, 1);
     for (int i = 0; i < s; ++i) {
       int j = i ? s - i : i;
       Complex a1 = (A[i] + A[j].conj()) * Complex(0.5, 0);
@@ -112,8 +136,7 @@ namespace fft {
       C1[j] = c11 + c12 * Complex(0, 1);
       C2[j] = c21 + c22 * Complex(0, 1);
     }
-    trans(C1, s, -1);
-    trans(C2, s, -1);
+    trans(C1, s, -1); trans(C2, s, -1);
     for (int i = 0 ; i < n + m - 1; ++i) {
       int x = int64(C1[i].x + 0.5) % mod;
       int y1 = int64(C1[i].y + 0.5) % mod;

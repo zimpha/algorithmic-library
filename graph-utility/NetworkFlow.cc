@@ -2,79 +2,102 @@
 #include <algorithm>
 
 namespace NetFlow {
-  const int N=100000,MAXM=100000,inf=1e9;
-  struct Edge {
-    int v,c,f,nx;//c:capcity, f:flow
-    Edge() {}
-    Edge(int v,int c,int f,int nx):v(v),c(c),f(f),nx(nx) {}
-  } E[MAXM];
-  int G[N],cur[N],pre[N],dis[N],gap[N],n,sz;
+  using flow_t = int;
+  const int N = 1e5 + 10, M = 1e5 + 10;
+  const flow_t inf = 1e9;
+  struct edge_t {
+    int to, nx;
+    flow_t cap, flow;
+    edge_t() {}
+    edge_t(int to, int nx, flow_t cap): 
+      to(to), nx(nx), cap(cap), flow(0) {}
+  } edges[M];
+  int G[N], cur[N], pre[N], gap[N], n, sz;
+  flow_t dis[N];
   void init(int _n) {
-    n=_n,sz=0; memset(G,-1,sizeof(G[0])*n);
+    n = _n, sz = 0;
+    memset(G, -1, sizeof(*G) * n);
   }
-  void link(int u,int v,int c) {
-    E[sz]=Edge(v,c,0,G[u]); G[u]=sz++;
-    E[sz]=Edge(u,0,0,G[v]); G[v]=sz++;
+  void link(int u, int v, flow_t c) {
+    edges[sz] = edge_t(v, G[u], c); G[u] = sz++;
+    edges[sz] = edge_t(u, G[v], 0); G[v] = sz++;
   }
-  int ISAP(int S,int T) {//S -> T
-    int maxflow=0,aug=inf,flag=false,u,v;
-    for (int i=0;i<n;++i)cur[i]=G[i],gap[i]=dis[i]=0;
-    for (gap[S]=n,u=pre[S]=S;dis[S]<n;flag=false) {
-      for (int &it=cur[u];~it;it=E[it].nx) {
-        if (E[it].c>E[it].f&&dis[u]==dis[v=E[it].v]+1) {
-          if (aug>E[it].c-E[it].f) aug=E[it].c-E[it].f;
-          pre[v]=u,u=v; flag=true;
-          if (u==T) {
-            for (maxflow+=aug;u!=S;) {
-              E[cur[u=pre[u]]].f+=aug;
-              E[cur[u]^1].f-=aug;
+  flow_t ISAP(int S, int T) {//S -> T
+    flow_t maxflow = 0, aug = inf;
+    memcpy(cur, G, sizeof(*G) * n);
+    memset(gap, 0, sizeof(*gap) * n);
+    memset(dis, 0, sizeof(*dis) * n);
+    gap[S] = n, pre[S] = S;
+    for (int u = S, flag = 0; dis[S] < n; flag = 0) {
+      for (int &it = cur[u]; ~it; it = edges[it].nx) {
+        int v = edges[it].to;
+        if (edges[it].cap > edges[it].flow && dis[u] == dis[v] + 1) {
+          aug = std::min(aug, edges[it].cap - edges[it].flow);
+          pre[v] = u, u = v, flag = true;
+          if (u == T) {
+            for (maxflow += aug; u != S; ) {
+              u = pre[u];
+              edges[cur[u]].flow += aug;
+              edges[cur[u] ^ 1].flow -= aug;
             }
-            aug=inf;
+            aug = inf;
           }
           break;
         }
       }
       if (flag) continue;
-      int mx=n;
-      for (int it=G[u];~it;it=E[it].nx) {
-        if (E[it].c>E[it].f&&dis[E[it].v]<mx) {
-          mx=dis[E[it].v]; cur[u]=it;
+      int mx = n;
+      for (int it = G[u]; ~it; it = edges[it].nx) {
+        if (edges[it].cap > edges[it].flow && dis[edges[it].to] < mx) {
+          mx = dis[edges[it].to];
+          cur[u] = it;
         }
       }
-      if ((--gap[dis[u]])==0) break;
-      ++gap[dis[u]=mx+1]; u=pre[u];
+      if (--gap[dis[u]] == 0) break;
+      ++gap[dis[u] = mx + 1];
+      u = pre[u];
     }
     return maxflow;
   }
-  bool bfs(int S,int T) {
-    static int Q[N]; memset(dis,-1,sizeof(dis[0])*n);
-    dis[S]=0; Q[0]=S;
-    for (int h=0,t=1,u,v,it;h<t;++h) {
-      for (u=Q[h],it=G[u];~it;it=E[it].nx) {
-        if (dis[v=E[it].v]==-1&&E[it].c>E[it].f) {
-          dis[v]=dis[u]+1; Q[t++]=v;
+  bool bfs(int S, int T) {
+    static int Q[N];
+    memset(dis, -1, sizeof(*dis) * n);
+    dis[S] = 0, Q[0] = S;
+    for (int h = 0, t = 1; h < t; ++h) {
+      for (int u = Q[h], it = G[u]; ~it; it = edges[it].nx) {
+        int v = edges[it].to;
+        if (dis[v] == -1 && edges[it].cap > edges[it].flow) {
+          dis[v] = dis[u] + 1;
+          Q[t++] = v;
         }
       }
     }
-    return dis[T]!=-1;
+    return dis[T] != -1;
   }
-  int dfs(int u,int T,int low) {
-    if (u==T) return low;
-    int ret=0,tmp,v;
-    for (int &it=cur[u];~it&&ret<low;it=E[it].nx) {
-      if (dis[v=E[it].v]==dis[u]+1&&E[it].c>E[it].f) {
-        if (tmp=dfs(v,T,std::min(low-ret,E[it].c-E[it].f))) {
-          ret+=tmp; E[it].f+=tmp; E[it^1].f-=tmp;
+  flow_t dfs(int u, int T, flow_t low) {
+    if (u == T) return low;
+    flow_t ret = 0;
+    for (int &it = cur[u]; ~it && ret < low; it = edges[it].nx) {
+      int v = edges[it].to;
+      if (dis[v] == dis[u] + 1 && edges[it].cap > edges[it].flow) {
+        flow_t tmp = dfs(v, T, std::min(low - ret, edges[it].cap - edges[it].flow));
+        if (tmp > 0) {
+          ret += tmp;
+          edges[it].flow += tmp;
+          edges[it ^ 1].flow -= tmp;
         }
       }
     }
-    if (!ret) dis[u]=-1; return ret;
+    if (!ret) dis[u] = -1;
+    return ret;
   }
-  int dinic(int S,int T) {
-    int maxflow=0,tmp;
-    while (bfs(S,T)) {
-      memcpy(cur,G,sizeof(G[0])*n);
-      while (tmp=dfs(S,T,inf)) maxflow+=tmp;
+  flow_t dinic(int S, int T) {
+    flow_t maxflow = 0, tmp;
+    while (bfs(S, T)) {
+      memcpy(cur, G, sizeof(*G) * n);
+      while (tmp = dfs(S, T, inf)) {
+        maxflow += tmp;
+      }
     }
     return maxflow;
   }
