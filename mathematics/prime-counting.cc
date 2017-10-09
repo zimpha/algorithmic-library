@@ -65,11 +65,8 @@ std::pair<std::vector<int64>, std::vector<int64>> prime_count(int64 n, int64 k, 
     if (ssum[p] == ssum[p - 1]) continue;
     int64 psum = ssum[p - 1], q = p * p, ed = std::min(v, n / q);
     int64 pk = pow_mod(p, k, mod);
-    for (int64 i = q; i <= v; i += q) {
-      mark[i] = true;
-    }
-    for (int i = 1; i <= ed; ++i) {
-      if (mark[i]) continue;
+    int delta = (p & 1) + 1;
+    for (int i = 1; i <= ed; i += delta) if (!mark[i]) {
       int64 d = i * p;
       if (d <= v) {
         lsum[i] = sub_mod(lsum[i], sub_mod(lsum[d], psum, mod) * pk % mod, mod);
@@ -77,6 +74,7 @@ std::pair<std::vector<int64>, std::vector<int64>> prime_count(int64 n, int64 k, 
         lsum[i] = sub_mod(lsum[i], sub_mod(ssum[n / d], psum, mod) * pk % mod, mod);
       }
     }
+    for (int64 i = q; i <= ed; i += p * delta) mark[i] = true;
     for (int64 i = v; i >= q; --i) {
       ssum[i] = sub_mod(ssum[i], sub_mod(ssum[i / p], psum, mod) * pk % mod, mod);
     }
