@@ -49,6 +49,8 @@ int64 get_pi(int64 n) {
 
 // return the sum of p^k for all p <= m, where m is in form floor(n / i)
 // for m <= sqrt{n}, stored in ssum[m]; for m > sqrt{n} stored in lsum[n / m]
+// note: if you need all correct value of ssum and lsum, please remove `mark` 
+// and make `delta` always be 1
 std::pair<std::vector<int64>, std::vector<int64>> prime_count(int64 n, int64 k, int64 mod) {
   auto pow_sum = [](int64 n, int64 k, int64 mod) {
     if (k == 0) return n;
