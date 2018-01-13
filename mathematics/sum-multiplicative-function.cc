@@ -9,131 +9,103 @@
  *
  * $f(i,n)=\sum\limits_{\substack{1 \le x \le n \\ \not \exists p > p_m \text{or } p < p_{i}, p \mid x}} f(x)$, $f(i,n)=f(i+1,n)+\sum\limits_{c \ge 1}f(i+1, \lfloor \frac{n}{p_i^c}\rfloor)$.
  *
- * the following program is an example of f(p^c) = p XOR c, 
- * change vector to array may be faster
+ * the following program is an example of \sum_{i=1}^{n} \sigma_0(i^m)
  */
 #include <cmath>
+#include <cassert>
+#include <cstdio>
+#include <cstring>
 #include <algorithm>
-#include <vector>
-#include <functional>
 
-using int64 = long long;
-using int128 = __int128;
+using uint64 = unsigned long long;
+using uint32 = unsigned int;
 
-const int mod = 1e9 + 7;
+constexpr uint32 N = 7e5; //this should be twice as \sqrt{n}
 
-inline int64 sub_mod(int64 x, int64 y) {
-  x -= y;
-  if (x < 0) x += mod;
-  return x;
-}
+uint64 e[N], g[N], sigma[N];
+uint32 ps[N], pcnt;
 
-int64 F(int64 n) {
-  const int s = static_cast<int64>(sqrt(n));
+uint64 lcnt[N], scnt[N];
+uint64 fval[N], fsum[N];
+int fsq[N];
 
-  auto sieve = [] (int n) {
-    std::vector<int> p;
-    std::vector<bool> mark(n + 1);
-    std::vector<int> f(n + 1, 1), e(n + 1, 0);
-    for (int i = 2; i <= n; ++i) {
-      if (!mark[i]) {
-        p.push_back(i);
-        f[i] = i ^ 1;
-        e[i] = 1;
+uint64 solve(uint64 n, uint64 m) {
+  const uint32 sn = sqrt(n);
+  auto sieve = [sn, m] () {
+    sigma[1] = 1, pcnt = 0;
+    memset(ps + 1, 0, sizeof(*ps) * sn);
+    for (uint32 i = 2; i <= sn; ++i) {
+      if (!ps[i]) {
+        ps[pcnt++] = i;
+        sigma[i] = e[i] = m + 1;
+        g[i] = 1;
       }
-      for (int j = 0, u = n / i; j < p.size() && p[j] <= u; ++j) {
-        int v = i * p[j];
-        mark[v] = 1;
-        if (i % p[j]) {
-          f[v] = f[i] * (p[j] ^ 1);
-          e[v] = 1;
+      for (uint64 j = 0, u = sn / i; j < pcnt && ps[j] <= u; ++j) {
+        uint64 p = ps[j], v = i * p;
+        ps[v] = 1;
+        if (i % p == 0) {
+          g[v] = g[i], e[v] = e[i] + m;
+          sigma[v] = g[v] * e[v];
         } else {
-          e[v] = e[i] + 1;
-          if (p[j] ^ e[i]) f[v] = f[i] / (p[j] ^ e[i]) * (p[j] ^ e[v]);
-          else f[v] = f[i / p[j]] / (p[j] ^ (e[i] - 1)) * (p[j] ^ e[v]);
-          break;
+          g[v] = sigma[i], e[v] = m + 1;
+          sigma[v] = g[v] * e[v];
         }
       }
     }
-    return std::make_pair(std::move(p), std::move(f));
   };
-
-  auto calc_G = [&s](int64 n) {
-    std::vector<int64> ssum(s + 1), lsum(s + 1);
-    std::vector<int64> scnt(s + 1), lcnt(s + 1);
-    std::vector<bool> mark(s + 1);
-    for (int i = 1; i <= s; ++i) {
-      ssum[i] = (int64)i * (i + 1) / 2 % mod - 1;
-      lsum[i] = int128(n / i) * (n / i + 1) / 2 % mod - 1;
-      scnt[i] = i - 1;
+  auto calc_g = [sn] (uint64 n, uint64 m) {
+    for (uint32 i = 1; i <= sn; ++i) {
       lcnt[i] = n / i - 1;
+      scnt[i] = i - 1;
     }
-    for (int64 p = 2; p <= s; ++p) {
+    for (uint32 p = 2; p <= sn; ++p) {
       if (scnt[p] == scnt[p - 1]) continue;
-      int64 psum = ssum[p - 1], pcnt = scnt[p - 1];
-      int64 q = p * p, ed = std::min<int64>(s, n / q);
-      for (int i = 1; i <= ed; ++i) {
-        int64 d = i * p;
-        if (d <= s) {
-          lsum[i] = sub_mod(lsum[i], sub_mod(lsum[d], psum) * p % mod);
-          lcnt[i] -= lcnt[d] - pcnt;
-        } else {
-          lsum[i] = sub_mod(lsum[i], sub_mod(ssum[n / d], psum) * p % mod);
-          lcnt[i] -= scnt[n / d] - pcnt;
+      uint64 pcnt = scnt[p - 1];
+      uint64 q = (uint64)p * p;
+      uint32 ed = std::min<uint64>(sn, n / q);
+      for (uint32 i = 1; i <= ed; ++i) {
+        uint64 d = (uint64)i * p;
+        if (d <= sn) lcnt[i] -= lcnt[d] - pcnt;
+        else lcnt[i] -= scnt[n / d] - pcnt;
+      }
+      for (uint32 i = sn; i >= q; --i) scnt[i] -= scnt[i / p] - pcnt;
+    }
+    for (uint32 i = 1; i <= sn; ++i) {
+      lcnt[i] = (lcnt[i] - scnt[sn]) * (m + 1);
+      scnt[i] *= m + 1;
+    }
+  };
+  auto calc_f = [sn] (uint64 n, uint64 m) {
+    for (uint32 i = 1; i <= sn; ++i) {
+      fval[i - 1] = i;
+      fval[sn - i + sn] = n / i;
+      fsum[i - 1] = 1;
+      fsum[sn - i + sn] = 1;
+    }
+    for (uint32 i = 0, j = 0; i < sn * 2; ++i) {
+      while (j < pcnt && (uint64)ps[j] * ps[j] <= fval[i]) ++j;
+      fsq[i] = j - 1;
+    }
+    for (int i = pcnt - 1, bound = sn * 2 - 1; i >= 0; --i) {
+      while (bound >= 0 && fsq[bound] >= i) --bound;
+      uint64 p = ps[i];
+      for (int j = sn * 2 - 1; j > bound; --j) {
+        uint64 x = fval[j], pe = p;
+        for (int c = 1; pe <= x; ++c, pe *= p) {
+          uint64 y = x / pe;
+          int k = y <= sn ? y - 1 : 2 * sn - n / y;
+          int l = ps[std::max<int>(i, fsq[k])], r = std::min<uint64>(y, sn);
+          fsum[j] += (fsum[k] + (l < r ? scnt[r] - scnt[l] : 0)) * (m * c + 1);
         }
       }
-      for (int64 i = s; i >= q; --i) {
-        ssum[i] = sub_mod(ssum[i], sub_mod(ssum[i / p], psum) * p % mod);
-        scnt[i] -= scnt[i / p] - pcnt;
-      }
     }
-    for (int i = 1; i <= s; ++i) {
-      ssum[i] = sub_mod(ssum[i], scnt[i]);
-      lsum[i] = sub_mod(lsum[i], lcnt[i] % mod);
-      if (i >= 2) ssum[i] += 2;
-      if (n / i >= 2) lsum[i] += 2;
-    }
-    for (int i = 1; i <= s; ++i) {
-      lsum[i] = sub_mod(lsum[i], ssum[s]);
-    }
-    return std::move(lsum);
+    return fsum[sn * 2 - 1];
   };
-
-  auto calc_F = [&s](int64 n, const std::vector<int> &p, const std::vector<int> &sf) {
-    std::vector<int64> val(s * 2), sum(s * 2, 1);
-    for (int i = 1; i <= s; ++i) val[i - 1] = i;
-    for (int i = s; i >= 1; --i) val[s - i + s] = n / i;
-    int ip = 0;
-    for (auto &&v: val) {
-      while (ip < p.size() && p[ip] <= v / p[ip]) ++ip;
-      v = ip - 1;
-    }
-    for (int i = p.size() - 1; i >= 0; --i) {
-      for (int j = s * 2 - 1; j >= 0; --j) {
-        if (val[j] < i) break;
-        int64 x = (j < s ? j + 1 : n / (s * 2 - j)) / p[i];
-        for (int c = 1; x; ++c, x /= p[i]) {
-          int k = x <= s ? x - 1 : 2 * s - n / x;
-          int l = p[std::max<int64>(i, val[k])], r = std::min<int64>(x, s);
-          sum[j] += (sum[k] + (l < r ? sf[r] - sf[l] : 0)) * (p[i] ^ c) % mod;
-        }
-        sum[j] %= mod;
-      }
-    }
-    return sum.back();
-  };
-
-  std::vector<int> p, f, sf(s + 1);
-  std::tie(p, f) = sieve(s);
-  for (auto &&x: p) sf[x] = f[x];
-  for (int i = 1; i <= s; ++i) {
-    sf[i] = (sf[i - 1] + sf[i]) % mod;
+  sieve();
+  calc_g(n, m);
+  uint64 ret = calc_f(n, m);
+  for (uint32 i = 1; i <= sn; ++i) {
+    ret += sigma[i] * lcnt[i];
   }
-  std::vector<int64> G = calc_G(n);
-  int64 ret = 0;
-  for (int i = 1; i <= s; ++i) {
-    ret += f[i] * G[i] % mod;
-  }
-  ret += calc_F(n, p, sf);
-  return ret % mod;
+  return ret;
 }

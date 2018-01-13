@@ -182,8 +182,6 @@ struct LinearRecurrence {
       trans[i] = (mod - A[i + 1]) % mod;
     }
     std::reverse(trans.begin(), trans.end());
-    for (auto &&x: trans) printf("%lld ", x);
-    puts("");
     init = {s.begin(), s.begin() + m};
   }
   int64 calc(int64 n) {
