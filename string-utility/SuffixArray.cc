@@ -34,7 +34,7 @@ private:
   void buildRankTable();
   void buildLCPArrayRMQ();
   template <class T> void computeLCPArray(const T *s);
-  template <class T> void countFrequence(const T *s, int n, int m);
+  template <class T> void countFrequency(const T *s, int n, int m);
   template <class T> void induce(const T *s, int *sa, int m, const SLTypes &t);
   template <class T> void sa_is(const T *s, int *sa, int n, int m);
 };
@@ -84,7 +84,7 @@ void SuffixArray::computeLCPArray(const T *s) {
 }
 
 template <class T>
-void SuffixArray::countFrequence(const T *s, int n, int m) {
+void SuffixArray::countFrequency(const T *s, int n, int m) {
   memset(freq, 0, sizeof(int) * m);
   for (int i = 0; i < n; ++i) ++freq[(int)s[i]];
   for (int i = 1; i < m; ++i) freq[i] += freq[i - 1];
@@ -113,7 +113,7 @@ void SuffixArray::sa_is(const T *s, int *sa, int n, int m) {
     t[i] = (s[i] == s[i + 1]) ? t[i + 1] : s[i] > s[i + 1];
   }
   freq = buffer, cur = buffer + m;
-  countFrequence(s, n, m);
+  countFrequency(s, n, m);
   for (int i = 1; i < n; ++i) if (t[i - 1] > t[i]) pushS(i);
   induce(s, sa, m, t);
   int n1 = 0, order = 0;
@@ -145,7 +145,7 @@ void SuffixArray::sa_is(const T *s, int *sa, int n, int m) {
   }
   memset(s1, 0, sizeof(int) * (n - n1));
   freq = buffer, cur = buffer + m;
-  countFrequence(s, n, m);
+  countFrequency(s, n, m);
   for (int i = n1 - 1; ~i; --i) pushS(-sa[i]);
   induce(s, sa, m, t);
 }
