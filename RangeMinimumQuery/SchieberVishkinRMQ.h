@@ -87,7 +87,7 @@ public:
 private:
   using uint = unsigned int;
   static uint lowbit(uint x) {
-    return x & ~x + 1; // x & (-x) or x & (x ^ (x - 1))
+    return x & (~x + 1); // x & (-x) or x & (x ^ (x - 1))
   }
   static uint highbit(uint x) {
     return 1u << (31 - __builtin_clz(x));

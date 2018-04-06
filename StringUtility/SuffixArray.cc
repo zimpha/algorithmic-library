@@ -1,4 +1,4 @@
-#include "../data-structure/RangeMinimumQuery.cc"
+#include "../RangeMinimumQuery/SchieberVishkinRMQ.cc"
 #include <cstring>
 #include <vector>
 #include <algorithm>
