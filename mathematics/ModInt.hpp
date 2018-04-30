@@ -12,6 +12,12 @@ struct UnsafeMod {
   UnsafeMod(): x(0) {}
   UnsafeMod(word _x): x(init(_x)) {}
 
+  bool operator == (const UnsafeMod& rhs) const {
+    return x == rhs.x;
+  }
+  bool operator != (const UnsafeMod& rhs) const {
+    return x != rhs.x;
+  }
   UnsafeMod& operator += (const UnsafeMod& rhs) {
     if ((x += rhs.x) >= mod) x -= mod;
     return *this;
