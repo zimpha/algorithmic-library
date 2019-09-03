@@ -1,6 +1,7 @@
 #include "fast-fourier-transform.cc"
 #include "basic.hpp"
 #include <cstring>
+#include <cstdio>
 
 using fft::N;
 
@@ -99,5 +100,61 @@ namespace Poly {// aint64 n should be power of 2
     }
     // NTT::trans(res, s, -1)
     memset(res + n, 0, sizeof(*res) * n);
+  }
+}
+
+// polynomial arithmetic in O(n^2)
+// mod should be a prime greater than n
+namespace poly_brutal {
+  // f = f * g mod x^n
+  void conv(int n, int64 f[], int64 g[], int64 mod) {
+    for (int i = n - 1; i >= 0; --i) {
+      int64 tmp = 0;
+      for (int j = 0; j <= i; ++j) {
+        tmp += f[j] * g[i - j] % mod;
+      }
+      f[i] = tmp % mod;
+    }
+  }
+  // f = g^{-1} mod x^n, g[0] != 0
+  void inv(int n, int64 f[], int64 g[], int64 mod) {
+    assert(g[0] != 0);
+    int64 inv0 = mod_inv(g[0], mod);
+    for (int i = 0; i < n; ++i) {
+      int64 tmp = 0;
+      for (int j = 0; j < i; ++j) {
+        tmp += f[j] * g[i - j] % mod;
+      }
+      if (!i) f[i] = inv0;
+      else f[i] = (mod - tmp % mod) * inv0 % mod;
+    }
+  }
+  // f = ln(g) mod x^n, g[0] = 1
+  void log(int n, int64 f[], int64 g[], int64 mod) {
+    assert(g[0] == 1);
+    inv(n, f, g, mod);
+    for (int i = n - 1; i >= 0; --i) {
+      int64 tmp = 0;
+      for (int j = 0; j <= i; ++j) {
+        tmp += f[i - j] * (j == n ?  0 : g[j + 1])  % mod * (j + 1) % mod;
+      }
+      f[i] = tmp % mod;
+    }
+    for (int i = n - 1; i >= 1; --i) {
+      f[i] = f[i - 1] * mod_inv(i, mod) % mod;
+    }
+    f[0] = 0;
+  }
+  // f= exp(g) mod x^n, g[0] = 0
+  void exp(int n, int64 f[], int64 g[], int64 mod) {
+    assert(g[0] == 0);
+    f[0] = 1;
+    for (int i = 1; i < n; ++i) {
+      int64 tmp = 0;
+      for (int j = 1; j <= i; ++j) {
+        tmp += j * g[j] % mod * f[i - j] % mod;
+      }
+      f[i] = tmp % mod * mod_inv(i, mod) % mod;
+    }
   }
 }
