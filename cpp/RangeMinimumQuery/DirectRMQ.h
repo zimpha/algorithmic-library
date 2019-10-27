@@ -48,7 +48,7 @@ private:
     while ((1 << height) < blocks) ++height;
     sparse_table.resize(blocks * height);
     int *u = &sparse_table[0];
-    for (int i = 0, idx = 0; i < n; i += block_size, ++idx) {
+    for (int i = 0, idx = 0; height && i < n; i += block_size, ++idx) {
       u[idx] = i;
       for (int j = i + 1; j < n && j < i + block_size; ++j) {
         u[idx] = leftMinIndex(a, u[idx], j);

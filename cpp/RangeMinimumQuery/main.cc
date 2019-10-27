@@ -1,4 +1,5 @@
 #include "DirectRMQ.h"
+#include "BitDirectRMQ.h"
 #include "DynamicRMQ.h"
 #include "OfflineRMQ.h"
 #include "SchieberVishkinRMQ.h"
@@ -20,6 +21,12 @@ int main() {
   di_rmq.build(a);
   ed = clock();
   printf("build time for DirectRMQ: %.3f sec\n", double(ed - st) / CLOCKS_PER_SEC);
+
+  st = clock();
+  BitDirectRMQ<int> bdi_rmq;
+  bdi_rmq.build(a);
+  ed = clock();
+  printf("build time for BitDirectRMQ: %.3f sec\n", double(ed - st) / CLOCKS_PER_SEC);
   
   st = clock();
   SchieberVishkinRMQ<int> sv_rmq;
@@ -35,7 +42,7 @@ int main() {
 
   OfflineRMQ<int> of_rmq;
 
-  std::vector<int> di_ans(q), sv_ans(q), dy_ans(q), of_ans;
+  std::vector<int> di_ans(q), bdi_ans(q), sv_ans(q), dy_ans(q), of_ans;
 
   // small interval
   puts("test small intervals:");
@@ -49,6 +56,13 @@ int main() {
   }
   ed = clock();
   printf(" - query time for DirectRMQ: %.3f sec\n", double(ed - st) / CLOCKS_PER_SEC);
+
+  st = clock();
+  for (int i = 0; i < q; ++i) {
+    bdi_ans[i] = a[bdi_rmq.query(a.data(), l[i], r[i])];
+  }
+  ed = clock();
+  printf(" - query time for BitDirectRMQ: %.3f sec\n", double(ed - st) / CLOCKS_PER_SEC);
 
   st = clock();
   for (int i = 0; i < q; ++i) {
@@ -70,7 +84,15 @@ int main() {
   printf(" - query time for OfflineRMQ: %.3f sec\n", double(ed - st) / CLOCKS_PER_SEC);
 
   for (int i = 0; i < q; ++i) {
-    assert(di_ans[i] == sv_ans[i] && sv_ans[i] == dy_ans[i] && dy_ans[i] == of_ans[i]);
+    int mx = a[l[i]];
+    for (int j = l[i]; j <= r[i]; ++j) {
+      mx = std::min(mx, a[j]);
+    }
+    assert(di_ans[i] == mx);
+    assert(di_ans[i] == bdi_ans[i]);
+    assert(bdi_ans[i] == sv_ans[i]);
+    assert(sv_ans[i] == dy_ans[i]);
+    assert(dy_ans[i] == of_ans[i]);
   }
 
   // random interval
@@ -90,6 +112,13 @@ int main() {
 
   st = clock();
   for (int i = 0; i < q; ++i) {
+    bdi_ans[i] = a[di_rmq.query(a.data(), l[i], r[i])];
+  }
+  ed = clock();
+  printf(" - query time for BitDirectRMQ: %.3f sec\n", double(ed - st) / CLOCKS_PER_SEC);
+
+  st = clock();
+  for (int i = 0; i < q; ++i) {
     sv_ans[i] = a[sv_rmq.query(l[i], r[i])];
   }
   ed = clock();
@@ -108,7 +137,7 @@ int main() {
   printf(" - query time for OfflineRMQ: %.3f sec\n", double(ed - st) / CLOCKS_PER_SEC);
 
   for (int i = 0; i < q; ++i) {
-    assert(di_ans[i] == sv_ans[i] && sv_ans[i] == dy_ans[i] && dy_ans[i] == of_ans[i]);
+    assert(di_ans[i] == bdi_ans[i] && bdi_ans[i] == sv_ans[i] && sv_ans[i] == dy_ans[i] && dy_ans[i] == of_ans[i]);
   }
 
   // large interval
@@ -131,6 +160,13 @@ int main() {
 
   st = clock();
   for (int i = 0; i < q; ++i) {
+    bdi_ans[i] = a[di_rmq.query(a.data(), l[i], r[i])];
+  }
+  ed = clock();
+  printf(" - query time for BitDirectRMQ: %.3f sec\n", double(ed - st) / CLOCKS_PER_SEC);
+
+  st = clock();
+  for (int i = 0; i < q; ++i) {
     sv_ans[i] = a[sv_rmq.query(l[i], r[i])];
   }
   ed = clock();
@@ -147,5 +183,9 @@ int main() {
   of_ans = of_rmq.solve(a, l, r);
   ed = clock();
   printf(" - query time for OfflineRMQ: %.3f sec\n", double(ed - st) / CLOCKS_PER_SEC);
+
+  for (int i = 0; i < q; ++i) {
+    assert(di_ans[i] == bdi_ans[i] && bdi_ans[i] == sv_ans[i] && sv_ans[i] == dy_ans[i] && dy_ans[i] == of_ans[i]);
+  }
   return 0;
 }

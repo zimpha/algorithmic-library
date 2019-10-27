@@ -39,17 +39,17 @@ public:
   int query(int u, int v) const {
     uint Iv = inlabel[v], Iu = inlabel[u];
     uint hIv = lowbit(Iv), hIu = lowbit(Iu);
-    uint mask = highbit((Iv ^ Iu) | hIv | hIu) - 1;
+    uint mask = highbit((Iv ^ Iu) | hIv | hIu);
     uint j = lowbit(ascendant[v] & ascendant[u] & ~mask);
     int x, y;
     if (j == hIv) x = v;
     else {
-      mask = highbit(ascendant[v] & (j - 1)) - 1;
+      mask = highbit(ascendant[v] & (j - 1));
       x = head[(indices[v] & ~mask | (mask + 1)) - 1];
     }
     if (j == hIu) y = u;
     else {
-      mask = highbit(ascendant[u] & (j - 1)) - 1;
+      mask = highbit(ascendant[u] & (j - 1));
       y = head[(indices[u] & ~mask | (mask + 1)) - 1];
     }
     return indices[x] < indices[y] ? x : y;
@@ -58,7 +58,10 @@ public:
 private:
   using uint = unsigned int;
   static uint lowbit(uint x) { return x & (~x + 1); }
-  static uint highbit(uint x) { return 1u << (31 - __builtin_clz(x)); }
+  static uint highbit(uint x) {
+    x |= x >> 1; x |= x >> 2; x |= x >> 4; x |= x >> 8; x |= x >> 16;
+    return x >> 1;
+  }
 
   std::vector<uint> indices;
   std::vector<uint> inlabel;
