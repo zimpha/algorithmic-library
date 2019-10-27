@@ -19,7 +19,7 @@ public:
     buildInnerBlocks(a, n);
   }
 
-  int query(const T *a, int l, int r) { // [l, r]
+  int query(const T *a, int l, int r) const { // [l, r]
     int x = l / block_size, y = r / block_size;
     if (x == y) return query_lookup(l, r);
     int ret = l;
@@ -29,20 +29,20 @@ public:
     return ret;
   }
   
-  int query_st(const T *a, int x, int y) {
+  int query_st(const T *a, int x, int y) const {
     int z = log[y - x + 1];
     return leftMinIndex(a, table[x + z * blocks], table[y - (1 << z) + 1 + z * blocks]);
   }
-  int query_lookup(int x, int y) {
+  int query_lookup(int x, int y) const {
     return x + __builtin_ctz(lookup[y] >> (x % block_size));
   }
 
 private:
-  int minIndex(const T *a, int x, int y) {
+  int minIndex(const T *a, int x, int y) const {
     return compare(a[x], a[y]) || (a[x] == a[y] && x < y) ? x : y;
   }
 
-  int leftMinIndex(const T *a, int x, int y) {
+  int leftMinIndex(const T *a, int x, int y) const {
     return compare(a[y], a[x]) ? y : x;
   }
 

@@ -17,7 +17,7 @@ public:
     buildInnerBlocks(a, n);
   }
 
-  int query(const T *a, int l, int r) { // [l, r]
+  int query(const T *a, int l, int r) const { // [l, r]
     const auto &table = sparse_table;
     int x = l / block_size + 1, y = r / block_size - 1, z, mask;
     int ret = l;
@@ -35,11 +35,11 @@ public:
   }
 
 private:
-  int minIndex(const T *a, int x, int y) {
+  int minIndex(const T *a, int x, int y) const {
     return compare(a[x], a[y]) || (a[x] == a[y] && x < y) ? x : y;
   }
 
-  int leftMinIndex(const T *a, int x, int y) {
+  int leftMinIndex(const T *a, int x, int y) const {
     return compare(a[y], a[x]) ? y : x;
   }
 
