@@ -76,7 +76,7 @@ template <class T>
 void SuffixArray::computeLCPArray(const T *s) {
   const int n = size() + 1;
   lcp.resize(n);
-  for (int i = 0, h = lcp[0] = 0; i < n; ++i) {
+  for (int i = 0, h = lcp[0] = 0; i < n; ++i) if (rank[i]) {
     int j = sa[rank[i] - 1];
     while (i + h < n && j + h < n && s[i + h] == s[j + h]) ++h;
     if (lcp[rank[i]] = h) --h;
