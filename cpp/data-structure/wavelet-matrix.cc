@@ -31,12 +31,12 @@ struct BitVector {
   }
   int rank(bool b, int p) const {return b ? rank(p) : p - rank(p);}
   int rank(bool b, int l, int r) const {return rank(b, r) - rank(b, l);}
-private:
+ private:
   static inline int popcount(uint x) {
-		x = x - ((x >> 1) & 0x55555555);
-		x = (x & 0x33333333) + ((x >> 2) & 0x33333333);
-		return ((x + (x >> 4) & 0xF0F0F0F) * 0x1010101) >> 24;
-	}
+    x = x - ((x >> 1) & 0x55555555);
+    x = (x & 0x33333333) + ((x >> 2) & 0x33333333);
+    return ((x + (x >> 4) & 0xF0F0F0F) * 0x1010101) >> 24;
+  }
 };
 
 struct WaveletMatrix {
@@ -81,35 +81,35 @@ struct WaveletMatrix {
   }
   // k-th element in position [left, right)
   value_t quantile(int left, int right, int k) const {
-		if(k < 0 || right - left <= k) { return -1; }
-		value_t val = 0;
-		for(int i = 0; i < height; i ++) {
-			const BitVector &bv = B[i];
-			int count = bv.rank(true, left, right);
-			bool dir = k < count;
-			val = val << 1 | (dir ? 1 : 0);
-			if(!dir) k -= count;
-			left = bv.rank(dir, left), right = bv.rank(dir, right);
-			if(dir) left += mids[i], right += mids[i];
-		}
-		return val;
-	}
+    if(k < 0 || right - left <= k) { return -1; }
+    value_t val = 0;
+    for(int i = 0; i < height; i ++) {
+      const BitVector &bv = B[i];
+      int count = bv.rank(true, left, right);
+      bool dir = k < count;
+      val = val << 1 | (dir ? 1 : 0);
+      if(!dir) k -= count;
+      left = bv.rank(dir, left), right = bv.rank(dir, right);
+      if(dir) left += mids[i], right += mids[i];
+    }
+    return val;
+  }
   // number of element less/greater than val in position [left, right), return the rank?
-	int rank_all(value_t val, int left, int right, int &res_lt, int &res_gt) const {
-		if(val > maxval) {
-			res_lt = right - left;
-			res_gt = 0;
-			return 0;
-		}
-		res_lt = res_gt = 0;
-		for(int i = 0; i < height; ++i) {
-			const BitVector &bv = B[i];
-			bool dir = val >> (height - i - 1) & 1;
-			int leftcount = bv.rank(dir, left), rightcount = bv.rank(dir, right);
-			(dir ? res_lt : res_gt) += (right - left) - (rightcount - leftcount);
-			left = leftcount, right = rightcount;
-			if(dir) left += mids[i], right += mids[i];
-		}
-		return right - left;
-	}
+  int rank_all(value_t val, int left, int right, int &res_lt, int &res_gt) const {
+    if(val > maxval) {
+      res_lt = right - left;
+      res_gt = 0;
+      return 0;
+    }
+    res_lt = res_gt = 0;
+    for(int i = 0; i < height; ++i) {
+      const BitVector &bv = B[i];
+      bool dir = val >> (height - i - 1) & 1;
+      int leftcount = bv.rank(dir, left), rightcount = bv.rank(dir, right);
+      (dir ? res_lt : res_gt) += (right - left) - (rightcount - leftcount);
+      left = leftcount, right = rightcount;
+      if(dir) left += mids[i], right += mids[i];
+    }
+    return right - left;
+  }
 };
