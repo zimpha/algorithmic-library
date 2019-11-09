@@ -1,7 +1,9 @@
-#include "basic.hpp"
+#include <cstdio>
 #include <cmath>
 #include <vector>
 #include <algorithm>
+
+using int64 = long long;
 
 namespace fft {
   const int N = 1 << 20, M = 31768;
@@ -85,7 +87,7 @@ namespace fft {
     }
     trans(A, s, -1);
     std::vector<int64> res(n + m - 1);
-    for (int i = 0; i < s; ++i) {
+    for (int i = 0; i < n + m - 1; ++i) {
       res[i] = (int64)(A[i].x + 0.5);
     }
     return res;
@@ -97,22 +99,23 @@ namespace fft {
     init(L);
     for (int i = 0; i < s; ++i) {
       A[i].x = (i << 1) < n ? a[i << 1] : 0;
+      B[i].x = (i << 1) < m ? b[i << 1] : 0;
       A[i].y = (i << 1 | 1) < n ? a[i << 1 | 1] : 0;
-      B[i].x = (i << 1) <  m ? b[i << 1] : 0;
       B[i].y = (i << 1 | 1) < m ? b[i << 1 | 1] : 0;
     }
     trans(A, s, 1); trans(B, s, 1);
     for (int i = 0; i < s; ++i) {
       int j = (s - i) & (s - 1);
-      A[i] = (Complex(4, 0) * (A[j] * B[j]).conj() - (A[j].conj() - A[i]) * (B[j].conj() - B[i]) * (w[i] + Complex(1, 0))) * Complex(0, 0.25);
+      C1[i] = (Complex(4, 0) * (A[j] * B[j]).conj() - (A[j].conj() - A[i]) * (B[j].conj() - B[i]) * (w[i] + Complex(1, 0))) * Complex(0, 0.25);
     }
     std::reverse(w + 1, w + s);
-    trans(A, s, -1);
-    std::vector<int64> res(n + m - 1);
+    trans(C1, s, -1);
+    std::vector<int64> res(n + m);
     for (int i = 0; i <= (n + m - 1) / 2; ++i) {
-      res[i << 1] = int64(A[i].y + 0.5);
-      res[i << 1 | 1] = int64(A[i].x + 0.5);
+      res[i << 1] = int64(C1[i].y + 0.5);
+      res[i << 1 | 1] = int64(C1[i].x + 0.5);
     }
+    res.resize(n + m - 1);
     return res;
   }
   // arbitrary modulo convolution
