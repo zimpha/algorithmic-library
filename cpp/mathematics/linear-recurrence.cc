@@ -5,7 +5,7 @@
 #include <algorithm>
 
 // given first m items init[0..m-1] and coefficents trans[0..m-1] or
-// given first 2 *m items init[0..2m-1], it will compute trans[0..m-1]
+// given first 2 * m items init[0..2m-1], it will compute trans[0..m-1]
 // for you. trans[0..m] should be given as that 
 //      init[m] = sum_{i=0}^{m-1} init[i] * trans[i]
 struct LinearRecurrence {
@@ -181,6 +181,7 @@ struct LinearRecurrence {
     for (int i = 0; i < m; ++i) {
       trans[i] = (mod - A[i + 1]) % mod;
     }
+    if (m == 0) m = 1, trans = {1};
     std::reverse(trans.begin(), trans.end());
     init = {s.begin(), s.begin() + m};
   }
