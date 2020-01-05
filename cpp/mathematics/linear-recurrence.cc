@@ -3,6 +3,7 @@
 #include <cassert>
 #include <functional>
 #include <algorithm>
+#include <random>
 
 // given first m items init[0..m-1] and coefficents trans[0..m-1] or
 // given first 2 * m items init[0..2m-1], it will compute trans[0..m-1]
@@ -80,9 +81,11 @@ struct LinearRecurrence {
     auto prime_power = [&] (const vec &s, int64 mod, int64 p, int64 e) {
       // linear feedback shift register mod p^e, p is prime
       std::vector<vec> a(e), b(e), an(e), bn(e), ao(e), bo(e);
-      vec t(e), u(e), r(e), to(e, 1), uo(e), pw(e + 1);;
-      pw[0] = 1;
-      for (int i = pw[0] = 1; i <= e; ++i) pw[i] = pw[i - 1] * p;
+      vec t(e), u(e), r(e), to(e, 1), uo(e), pw(e + 1, 1);;
+      for (int i = 1; i <= e; ++i) {
+        pw[i] = pw[i - 1] * p;
+        assert(pw[i] <= mod);
+      }
       for (int64 i = 0; i < e; ++i) {
         a[i] = {pw[i]}, an[i] = {pw[i]};
         b[i] = {0}, bn[i] = {s[0] * pw[i] % mod};
@@ -120,6 +123,7 @@ struct LinearRecurrence {
             } else {
               int64 coef = t[o] * inverse(to[g], mod) % mod * pw[u[o] - uo[g]] % mod;
               int m = k - r[g];
+              assert(m >= 0);
               extand(an[o], ao[g].size() + m);
               extand(bn[o], bo[g].size() + m);
               for (size_t i = 0; i < ao[g].size(); ++i) {
@@ -172,11 +176,12 @@ struct LinearRecurrence {
   LinearRecurrence(const vec &s, const vec &c, int64 mod):
     init(s), trans(c), mod(mod), m(s.size()) {}
   LinearRecurrence(const vec &s, int64 mod, bool is_prime = true): mod(mod) {
+    assert(s.size() % 2 == 0);
     vec A;
     if (is_prime) A = BerlekampMassey(s, mod);
     else A = ReedsSloane(s, mod);
-    if (A.empty()) A = {0};
-    m = A.size() - 1;
+    m = s.size() / 2;
+    A.resize(m + 1, 0);
     trans.resize(m);
     for (int i = 0; i < m; ++i) {
       trans[i] = (mod - A[i + 1]) % mod;
@@ -221,3 +226,52 @@ struct LinearRecurrence {
   int64 mod;
   int m;
 };
+
+void verify() {
+  using int64 = long long;
+  std::mt19937 gen{0};
+  for (int cas = 1; cas <= 1000; ++cas) {
+    std::uniform_int_distribution<int> dis_mod(1, 1 << 31);
+    std::uniform_int_distribution<int> dis_n(1, 100);
+    int n = dis_n(gen), mod = dis_mod(gen);
+    std::uniform_int_distribution<int> dis_a(0, mod - 1);
+    std::vector<int64> a(n), c(n);
+    for (int i = 0; i < n; ++i) {
+      a[i] = dis_a(gen);
+      c[i] = dis_a(gen);
+    }
+    for (int i = n; i <= n * 2; ++i) {
+      int64 sum = 0;
+      for (int j = 0; j < n; ++j) {
+        sum += c[j] * a[i - 1 - j] % mod;
+      }
+      a.push_back(sum % mod);
+    }
+    auto u = a.back(); a.pop_back();
+    LinearRecurrence lr{a, mod, false};
+    a.push_back(u);
+    for (size_t i = 0; i < a.size(); ++i) {
+      assert(lr.calc(i) == a[i]);
+    }
+  }
+}
+
+// http://www.spoj.com/problems/FINDLR/
+void solve() {
+  int T;
+  scanf("%d", &T);
+  for (int cas = 1; cas <= T; ++cas) {
+    int n, mod;
+    scanf("%d%d", &n, &mod);
+    std::vector<LinearRecurrence::int64> a(n * 2);
+    for (int i = 0; i < n * 2; ++i) scanf("%lld", &a[i]);
+    LinearRecurrence lr{a, mod, false};
+    printf("%lld\n", lr.calc(n * 2));
+  }
+}
+
+int main() {
+  verify();
+  //solve();
+  return 0;
+}
