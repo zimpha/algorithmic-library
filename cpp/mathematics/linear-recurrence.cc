@@ -194,10 +194,10 @@ struct LinearRecurrence {
     if (mod == 1) return 0;
     if (n < m) return init[n];
     vec v(m), u(m << 1);
-    int msk = !!n;
+    int64 msk = !!n;
     for (int64 m = n; m > 1; m >>= 1) msk <<= 1;
     v[0] = 1 % mod;
-    for (int x = 0; msk; msk >>= 1, x <<= 1) {
+    for (int64 x = 0; msk; msk >>= 1, x <<= 1) {
       std::fill_n(u.begin(), m * 2, 0);
       x |= !!(n & msk);
       if (x < m) u[x] = 1 % mod;
