@@ -9,126 +9,119 @@
 /****************************** Basic Geometry ********************************/
 
 using flt = double;
-const flt eps = 1e-12, inf = 1e30, PI = acos(-1.0);
-template<typename T>
-inline T sqr(T x) {return x * x;}
-inline flt cmp(flt a, flt b, flt e = eps) {
-  return fabs(a - b) >= e + fabs(a) * e ? a - b : 0;
-}
-inline int sgn(flt x, flt e = eps) {return x < -e ? -1 : (x > e);}
-inline flt fix(flt x, flt e = eps) {return cmp(x, 0, e);}
+using int64 = long long;
 
-struct point {
-  flt x, y;
-  point(flt x = 0, flt y = 0): x(x), y(y) {}
-  bool operator < (const point &rhs) const {
-    return cmp(x, rhs.x) < 0 || (cmp(x, rhs.x) == 0 && cmp(y, rhs.y) < 0);
+const flt eps = 1e-8, pi = acos(-1.0);
+
+template <class T>
+inline int sgn(T x, T e = eps) { return x < -e ? -1 : x > e; }
+template <class T>
+inline T sqr(T x) { return x * x; }
+template <class T>
+inline T cmp(T a, T b, T e = eps) {
+  return std::abs(a - b) >= e + std::abs(a) * e ? a - b : 0;
+}
+inline flt fix(flt x, flt e = eps) {return cmp(x, 0., e);}
+
+template <class T>
+struct Point {
+  T x, y;
+  Point(T x = 0, T y = 0): x(x), y(y) {}
+  bool operator < (const Point &o) const { return x < o.x || (x == o.x && y < o.y); }
+  bool operator == (const Point &o) const { return x == o.x && y == o.y; }
+  Point operator + (const Point &o) const { return Point(x + o.x, y + o.y); }
+  Point operator - (const Point &o) const { return Point(x - o.x, y - o.y); }
+  Point operator * (T k) const { return Point(x * k, y * k); }
+  Point operator / (T k) const { return Point(x / k, y / k); }
+  T dot(const Point &o) const { return x * o.x + y * o.y; }
+  T det(const Point &o) const { return x * o.y - y * o.x; }
+  T norm2() const { return x * x + y * y; }
+  flt norm() const { return hypot(x, y); }
+  flt ang() const { return atan2(y, x); }
+  Point perp() const { return Point(-y, x); } // rotate 90 degrees
+  Point unit() const { return *this / norm(); }
+  Point trunc(flt k) const { return unit() * k; }
+  // counter clockwise rotate a rad
+  Point rot(flt a) const {
+    return Point(x * cos(a) - y * sin(a), x * sin(a) + y * cos(a));
   }
-  bool operator == (const point &rhs) const {
-    return cmp(x, rhs.x) == 0 && cmp(y, rhs.y) == 0;
-  }
-  point operator + (const point &rhs) const {
-    return point(x + rhs.x, y + rhs.y);
-  }
-  point operator - (const point &rhs) const {
-    return point(x - rhs.x, y - rhs.y);
-  }
-  point operator * (const flt k) const {
-    return point(x * k, y * k);
-  }
-  point operator / (const flt k) const {
-    return point(x / k, y / k);
-  }
-  point operator ~ () const {// counter clockwise rotate 90 degree
-    return point(-y, x);
-  }
-  flt dot(const point &rhs) const {
-    return x * rhs.x + y * rhs.y;
-  }
-  flt det(const point &rhs) const {
-    return x * rhs.y - y * rhs.x;
-  }
-  flt norm2() const {
-    return x * x + y * y;
-  }
-  flt norm() const {
-    return hypot(x, y);
-  }
-  point rot(flt a) const {// counter clockwise rotate A rad
-    return point(x * cos(a) - y * sin(a), x * sin(a) + y * cos(a));
-  }
-  point rot(flt cosa, flt sina) const {// counter clockwise rotate using cos/sin
-    return point(x * cosa - y * sina, x * sina + y * cosa);
-  }
-  point trunc(flt a = 1.0) const {
-    return (*this) * (a / this->norm());
+  // counter clockwise rotate using cos/sin
+  Point rot(flt cosa, flt sina) const {
+    return Point(x * cosa - y * sina, x * sina + y * cosa);
   }
 };
 
+using point = Point<flt>;
 using poly_t = std::vector<point>;
 
-// check if point $O$ is on segment $AB$
-bool OnSeg(const point &A, const point &B, const point &O) {
-  return sgn((A - O).det(B - O)) == 0 && sgn((A - O).dot(B - O)) <= 0;
+template <class P>
+bool on_seg(const P &a, const P &b, const P &o) {
+  return sgn((a - o).det(b - o)) == 0 && sgn((a - o).dot(b - o)) <= 0;
 }
 
-// check if line $AB$ is parallel to line $CD$
-bool IsParallel(const point &A, const point &B, const point &C, const point &D) {
-  return sgn((B - A).det(D - C)) == 0;
+template <class P>
+bool is_parallel(const P &a, const P &b, const P &c, const P &d) {
+  return sgn((b - a).det(d - c)) == 0;
 }
 
-// check intersection of segments $AB$ and $CD$, store intersection in $P$
-bool SegInter(const point &A, const point &B, const point &C, const point &D, point &P) {
-  if (OnSeg(A, B, C)) {P = C; return true;}
-  if (OnSeg(A, B, D)) {P = D; return true;}
-  if (OnSeg(C, D, A)) {P = A; return true;}
-  if (OnSeg(C, D, B)) {P = B; return true;}
-  point AB(B - A), CD(D - C);
-  if (sgn(AB.det(CD)) == 0) return false; // parallel
-  int d1 = sgn(AB.det(C - A)) * sgn(AB.det(D - A));
-  int d2 = sgn(CD.det(A - C)) * sgn(CD.det(B - C));
-  P = A + AB * (CD.det(C - A) / CD.det(AB));
+// find intersection of segments ab and cd, stored in p
+template <class P>
+bool seg_inter(const P &a, const P &b, const P &c, const P &d, P &p) {
+  if (on_seg(a, b, c)) return p = c, true;
+  if (on_seg(a, b, d)) return p = d, true;
+  if (on_seg(c, d, a)) return p = a, true;
+  if (on_seg(c, d, b)) return p = b, true;
+  P ab{b - a}, cd{d - c};
+  if (sgn(ab.det(cd)) == 0) return false; // parallel
+  int d1 = sgn(ab.det(c - a)) * sgn(ab.det(d - a));
+  int d2 = sgn(cd.det(a - c)) * sgn(cd.det(b - c));
+  p = a + ab * (cd.det(c - a) / cd.det(ab));
   return d1 < 0 && d2 < 0;
 }
 
-// check intersection of lines $AB$ and $CD$, store intersection in $P$
-bool LineInter(const point &A, const point &B, const point &C, const point &D, point &P) {
-  point AB(B - A), CD(D - C);
-  if (sgn(AB.det(CD)) == 0) return false; // parallel
-  P = A + AB * (CD.det(C - A) / CD.det(AB));
+// find intersection of lines ab and cd, stored in p
+template <class P>
+bool line_inter(const P &a, const P &b, const P &c, const P &d, P &p) {
+  P ab{b - a}, cd{d - c};
+  if (sgn(ab.det(cd)) == 0) return false; // parallel
+  p = a + ab * (cd.det(c - a) / cd.det(ab));
   return true;
 }
 
-// find the minimum distance from point $O$ to segment $AB$
-flt Dis2Seg(const point &A, const point &B, const point &O) {
-  if (sgn((O - A).dot(B - A)) < 0) return (O - A).norm();
-  if (sgn((O - B).dot(A - B)) < 0) return (O - B).norm();
-  return fabs((O - A).det(B - A) / (A - B).norm());
+// minimum distance from o to segment ab
+template <class P>
+flt dis2seg(const P &a, const P &b, const P &o) {
+  P ao{o - a}, bo{o - b}, ab{b - a};
+  if (sgn(ao.dot(ab)) < 0) return ao.norm();
+  if (sgn(-bo.dot(ab)) < 0) return bo.norm();
+  return std::abs(ao.det(ab)) / ab.norm();
 }
 
-// find the minimum distance from segment $AB$ to segment $CD$
-flt DisSeg2Seg(const point &A, const point &B, const point &C, const point &D) {
-  point O;
-  if (SegInter(A, B, C, D, O)) return 0;
-  else return std::min(std::min(Dis2Seg(A, B, C), Dis2Seg(A, B, D)),
-                       std::min(Dis2Seg(C, D, A), Dis2Seg(C, D, B)));
+// find the minimum distance from segment ab to segment cd
+template <class P>
+flt dis_seg2seg(const P &a, const P &b, const P &c, const P &d) {
+  P o;
+  if (seg_inter(a, b, c, d, o)) return 0;
+  else return std::min(std::min(dis2seg(a, b, c), dis2seg(a, b, d)),
+                       std::min(dis2seg(c, d, a), dis2seg(c, d, b)));
 }
 
 // move line AB along normal vector
-void move_d(point &A, point &B, const flt len) {
-  point D = ~(B - A).trunc();
-  A = A + (D * len), B = B + (D * len);
+void move_d(point &a, point &b, const flt len) {
+  auto d = (b - a).perp().trunc(len);
+  a = a + d, b = b + d;
 }
 
-// project point O on line AB
-point project(const point &A, const point &B, const point &O) {
-  point AB = B - A;
-  return A + AB * (AB.dot(O - A) / AB.norm2());
+// project point o on line ab
+point project(const point &a, const point &b, const point &o) {
+  auto ab = b - a;
+  return a + ab * (ab.dot(o - a) / ab.norm2());
 }
 
-point reflect(const point &A, const point &B, const point &O) {
-  point AB = B - A;
-  return (A + AB * (AB.dot(O - A) / AB.norm2())) * 2 - O;
+// find the reflect point of o with respect to line ab
+point reflect(const point &a, const point &b, const point &o) {
+  auto ab = b - a;
+  return (a + ab * (ab.dot(o - a) / ab.norm2())) * 2 - o;
 }
 
 /************************************ Circle Utilities *****************************************/

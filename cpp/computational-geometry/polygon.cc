@@ -1,30 +1,32 @@
 #include "geo2d.hpp"
+#include <tuple>
 
-// check point O in polygon P; 0:outside, 2:border, 1:inside
-int InPolygon(const poly_t &P, const point &O) {
-  int cnt = 0, n = P.size();
+// check point o in polygon p; 0:outside, 2:border, 1:inside
+int in_polygon(const poly_t &p, const point &o) {
+  int cnt = 0, n = p.size();
   for (int i = 0; i < n; ++i) {
-    const point &A = P[i], &B = P[(i + 1) % n];
-    if (OnSeg(A, B, O)) return 2;
-    int k = sgn((B - A).det(O - A));
-    int d1 = sgn(A.y - O.y), d2 = sgn(B.y - O.y);
+    const auto &a = p[i], &b = p[(i + 1) % n];
+    if (on_seg(a, b, o)) return 2;
+    int k = sgn((b - a).det(o - a));
+    int d1 = sgn(a.y - o.y), d2 = sgn(b.y - o.y);
     cnt += (k > 0 && d1 <= 0 && d2 > 0);
     cnt -= (k < 0 && d2 <= 0 && d1 > 0);
   }
   return cnt != 0;
 }
 
-flt Area(const poly_t &P, point &res) {
+// find the area of the polygon and store the centroid in o
+flt area(const poly_t &p, point &o) {
   flt sum = 0;
-  res = point(0, 0);
-  int n = P.size();
+  o = {0, 0};
+  int n = p.size();
   for (int i = 0; i < n; ++i) {
-    const point &A = P[i], &B = P[(i + 1) % n];
-    sum += B.det(A);
-    res = res + (A + B) * B.det(A);
+    const auto &a = p[i], &b = p[(i + 1) % n];
+    sum += b.det(a);
+    o = o + (a + b) * b.det(a);
   }
-  sum = abs(sum);
-  res = res / (3.0 * sum);
+  sum = std::abs(sum);
+  o = o / (3.0 * sum);
   return sum * 0.5;
 }
 
@@ -116,7 +118,7 @@ struct ConvexHull {
   // return the area of the convex and the mass center.
   // Time Complexity: O(n)
   flt area(point &center) const {
-    return Area(ps, center);
+    return ::area(ps, center);
   }
   // check whether P is inside the convex, {0, 2, 1} : {outside, border, inside}.
   // Time Complexity: O(log n)
@@ -139,13 +141,18 @@ struct ConvexHull {
 // intersection of half plane
 struct halfplane_t {
   point a, b; // left side of vector \vec{ab}, i.e. \vec{ab} \times \vec{ap} > 0
-  flt ang;
   halfplane_t() {}
-  halfplane_t(const point &a, const point &b): a(a), b(b) {
-    ang = atan2(b.y - a.y, b.x - a.x);
+  halfplane_t(const point &a, const point &b): a(a), b(b) {}
+  int cmp(const halfplane_t &l) const {
+    auto u = b - a, v = l.b - l.a;
+    int suy = sgn(u.y), svy = sgn(v.y), du = 1, dv = 1;
+    if (suy < 0 || (suy == 0 && sgn(u.x) > 0)) du = -1;
+    if (svy < 0 || (svy == 0 && sgn(v.x) > 0)) dv = -1;
+    if (du == dv) return sgn(v.det(u));
+    else return du < dv ? -1 : 1;
   }
   bool operator < (const halfplane_t &l) const {
-    int res = sgn(ang - l.ang);
+    int res = cmp(l);
     return res == 0 ? l.side(a) >= 0: res < 0;
   }
   int side(const point &p) const {// 1: left, 0: on, -1:right
@@ -158,13 +165,13 @@ struct halfplane_t {
   }
 };
 
-poly_t half_plane(std::vector<halfplane_t> v) {
+poly_t area(std::vector<halfplane_t> v) {
   std::sort(v.begin(), v.end());
   std::deque<halfplane_t> q;
   q.push_back(v[0]);
   std::deque<point> ans;
   for (size_t i = 1; i < v.size(); ++ i) {
-    if (sgn(v[i].ang - v[i - 1].ang) == 0) continue;
+    if (v[i].cmp(v[i - 1]) == 0) continue;
     while (ans.size() && v[i].side(ans.back()) < 0) ans.pop_back(), q.pop_back();
     while (ans.size() && v[i].side(ans.front()) < 0) ans.pop_front(), q.pop_front();
     ans.push_back(q.back().inter(v[i]));
@@ -172,12 +179,64 @@ poly_t half_plane(std::vector<halfplane_t> v) {
   }
   while (ans.size() && q.front().side(ans.back()) < 0) ans.pop_back(), q.pop_back();
   while (ans.size() && q.back().side(ans.front()) < 0) ans.pop_front(), q.pop_front();
-  if (q.size() <= 2) return poly_t();
+  if (q.size() <= 2) return {};
   std::vector<point> pt(ans.begin(), ans.end());
   pt.push_back(q.front().inter(q.back()));
-  // these two lines are used to erase duplicated points
-  // but the order of point will be changed
-  std::sort(pt.begin(), pt.end());
-  pt.erase(std::unique(pt.begin(), pt.end()), pt.end());
   return pt;
+}
+
+template <class P>
+std::vector<std::tuple<int, int, int>> triangulation(const std::vector<P> &poly) {
+  int n = poly.size();
+  if (n == 3) return {std::make_tuple(0, 1, 2)};
+  std::vector<int> eras, reflex;
+  std::vector<int> prev(n), next(n);
+  std::vector<bool> is_era(n), del(n);
+  for (int i = 0; i < n; ++i) {
+    int a = (i - 1 + n) % n, b = i, c = (i + 1) % n;
+    prev[i] = a, next[i] = c;
+    if ((poly[b] - poly[a]).det(poly[c] - poly[a]) < 0) reflex.push_back(i);
+  }
+
+  auto check = [&] (int a, int b, int c) {
+    auto &A = poly[a], &B = poly[b], &C = poly[c];
+    auto AB = B - A, BC = C - B, CA = A - C;
+    for (auto &v: reflex) if (v != a && v != b && v != c) {
+      auto AV = poly[v] - A, BV = poly[v] - B, CV = poly[v] - C;
+      if (AB.det(AV) >= 0 && BC.det(BV) >= 0 && CA.det(CV) >= 0) return false;
+    }
+    return true;
+  };
+
+  for (int i = 0; i < n; ++i) {
+    int a = (i - 1 + n) % n, b = i, c = (i + 1) % n;
+    if ((poly[b] - poly[a]).det(poly[c] - poly[a]) < 0) continue;
+    if (check(a, b, c)) {
+      is_era[i] = true;
+      eras.push_back(i);
+    }
+  }
+
+  std::vector<std::tuple<int, int, int>> ret;
+  while (!eras.empty()) {
+    int b = eras.back(); eras.pop_back();
+    if (!is_era[b] || del[b]) continue;
+    int a = prev[b], c = next[b];
+    next[a] = c; prev[c] = a;
+    del[b] = true; --n;
+    is_era[a] = is_era[c] = false;
+    ret.emplace_back(a, b, c);
+    if (n == 3) {
+      ret.emplace_back(prev[a], a, c);
+      break;
+    }
+    int pa = prev[a], nc = next[c];
+    if ((poly[a] - poly[pa]).det(poly[c] - poly[pa]) > 0 && check(pa, a, c)) {
+      eras.push_back(a); is_era[a] = true;
+    }
+    if ((poly[c] - poly[a]).det(poly[nc] - poly[a]) > 0 && check(a, c, nc)) {
+      eras.push_back(c); is_era[c] = true;
+    }
+  }
+  return ret;
 }
