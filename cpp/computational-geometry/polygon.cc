@@ -153,7 +153,7 @@ struct halfplane_t {
   }
   bool operator < (const halfplane_t &l) const {
     int res = cmp(l);
-    return res == 0 ? l.side(a) >= 0: res < 0;
+    return res == 0 ? l.side(a) > 0: res < 0;
   }
   int side(const point &p) const {// 1: left, 0: on, -1:right
     return sgn((b - a).det(p - a));
@@ -165,7 +165,7 @@ struct halfplane_t {
   }
 };
 
-poly_t area(std::vector<halfplane_t> v) {
+poly_t halfplane(std::vector<halfplane_t> v) {
   std::sort(v.begin(), v.end());
   std::deque<halfplane_t> q;
   q.push_back(v[0]);
