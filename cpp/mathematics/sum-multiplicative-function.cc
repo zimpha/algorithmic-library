@@ -90,9 +90,8 @@ uint64 solve(uint64 n, uint64 m) {
       while (bound >= 0 && fsq[bound] >= i) --bound;
       uint64 p = ps[i];
       for (int j = sn * 2 - 1; j > bound; --j) {
-        uint64 x = fval[j], pe = p;
-        for (int c = 1; pe <= x; ++c, pe *= p) {
-          uint64 y = x / pe;
+        uint64 x = fval[j], pe = p, y = x / pe;
+        for (int c = 1; y; ++c, pe *= p, y /= p) {
           int k = y <= sn ? y - 1 : 2 * sn - n / y;
           int l = ps[std::max<int>(i, fsq[k])], r = std::min<uint64>(y, sn);
           fsum[j] += (fsum[k] + (l < r ? scnt[r] - scnt[l] : 0)) * (m * c + 1);

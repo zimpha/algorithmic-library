@@ -5,15 +5,35 @@
 #include <algorithm>
 #include <random>
 
-// given first m items init[0..m-1] and coefficents trans[0..m-1] or
-// given first 2 * m items init[0..2m-1], it will compute trans[0..m-1]
-// for you. trans[0..m] should be given as that 
+// 1. Given first m items init[0..m-1] and coefficents trans[0..m-1]
+//
+// ```cpp
+// std::vector<int64> init = {1, 1};
+// std::vector<int64> trans = {1, 1};
+// const int mod = 1e9 + 7; // 998244353; 1000000006;
+// LinearRecurrence lr{init, trans, mod};
+// std::cout << lr.calc(1000000000000000000ll) << std::endl;
+// ```
+//
+// 2. Given first 2 * m items init[0..2m-1], it will compute trans[0..m-1]
+//    trans[0..m] will be given as that:
 //      init[m] = sum_{i=0}^{m-1} init[i] * trans[i]
+//    you should make sure that init[0] is not zero and init[i] is in [0, mod - 1]
+//
+// ```cpp
+// std::vector<int64> init = {1, 1, 2, 3, 5, 8, 13};
+// const int prime_mod = 998244353;
+// LinearRecurrence lr1{init, prime_mod};
+// std::cout << lr.calc(1000000000000000000ll) << std::endl;
+// const int non_prime_mod = 1000000006;
+// LinearRecurrence lr2{init, non_prime_mod, false};
+// std::cout << lr.calc(1000000000000000000ll) << std::endl;
+// ```
 struct LinearRecurrence {
   using int64 = long long;
   using vec = std::vector<int64>;
 
-  static void extand(vec &a, size_t d, int64 value = 0) {
+  static void extend(vec &a, size_t d, int64 value = 0) {
     if (d <= a.size()) return;
     a.resize(d, value);
   }
@@ -23,6 +43,7 @@ struct LinearRecurrence {
     };
     vec A = {1}, B = {1};
     int64 b = s[0];
+    assert(b != 0);
     for (size_t i = 1, m = 1; i < s.size(); ++i, m++) {
       int64 d = 0;
       for (size_t j = 0; j < A.size(); ++j) {
@@ -31,7 +52,7 @@ struct LinearRecurrence {
       if (!(d %= mod)) continue;
       if (2 * (A.size() - 1) <= i) {
         auto temp = A;
-        extand(A, B.size() + m);
+        extend(A, B.size() + m);
         int64 coef = d * inverse(b) % mod;
         for (size_t j = 0; j < B.size(); ++j) {
           A[j + m] -= coef * B[j] % mod;
@@ -39,7 +60,7 @@ struct LinearRecurrence {
         }
         B = temp, b = d, m = 0;
       } else {
-        extand(A, B.size() + m);
+        extend(A, B.size() + m);
         int64 coef = d * inverse(b) % mod;
         for (size_t j = 0; j < B.size(); ++j) {
           A[j + m] -= coef * B[j] % mod;
@@ -118,14 +139,14 @@ struct LinearRecurrence {
             for (u[o] = 0, t[o] = d; t[o] % p == 0; t[o] /= p, ++u[o]);
             int g = e - 1 - u[o];
             if (L(a[g], b[g]) == 0) {
-              extand(bn[o], k + 1);
+              extend(bn[o], k + 1);
               bn[o][k] = (bn[o][k] + d) % mod;
             } else {
               int64 coef = t[o] * inverse(to[g], mod) % mod * pw[u[o] - uo[g]] % mod;
               int m = k - r[g];
               assert(m >= 0);
-              extand(an[o], ao[g].size() + m);
-              extand(bn[o], bo[g].size() + m);
+              extend(an[o], ao[g].size() + m);
+              extend(bn[o], bo[g].size() + m);
               for (size_t i = 0; i < ao[g].size(); ++i) {
                 an[o][i + m] -= coef * ao[g][i] % mod;
                 if (an[o][i + m] < 0) an[o][i + m] += mod;
