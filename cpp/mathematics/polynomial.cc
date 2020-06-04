@@ -44,7 +44,8 @@ namespace Poly {// aint64 n should be power of 2
       deg >>= 1;
     }
     std::reverse(degs.begin(), degs.end());
-    res[0] = deg = 1;
+    res[0] = pow_mod(poly[0], mod - 2, mod);
+    deg = 1;
     for (int t: degs) {
       fft::conv(poly, res, t + 1, deg, mod, tmp1);
       fft::conv(res, tmp1 + deg, t + 1 - deg, t + 1 - deg, mod, tmp1);
