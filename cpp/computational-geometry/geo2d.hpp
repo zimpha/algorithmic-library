@@ -129,7 +129,7 @@ point reflect(const point &a, const point &b, const point &o) {
 bool intersect(const point &A, flt ra, const point &B, flt rb, point &P, point &Q) {
   point AB(B - A);
   double dis = AB.norm();
-  if (sgn(dis - (ra + rb)) > 0 || sgn(dis - fabs(ra - rb)) < 0) return false;
+  if (sgn(dis) == 0 || sgn(dis - (ra + rb)) > 0 || sgn(dis - fabs(ra - rb)) < 0) return false;
   flt cosa = (dis * dis + ra * ra - rb * rb) / (2 * dis * ra);
   flt sina = sqrt(fix(1.0 - cosa * cosa));
   AB = AB * (ra / dis);
