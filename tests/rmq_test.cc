@@ -1,8 +1,8 @@
-#include "DirectRMQ.h"
-#include "BitDirectRMQ.h"
-#include "DynamicRMQ.h"
-#include "OfflineRMQ.h"
-#include "SchieberVishkinRMQ.h"
+#include "../cpp/RangeMinimumQuery/DirectRMQ.h"
+#include "../cpp/RangeMinimumQuery/BitDirectRMQ.h"
+#include "../cpp/RangeMinimumQuery/DynamicRMQ.h"
+#include "../cpp/RangeMinimumQuery/OfflineRMQ.h"
+#include "../cpp/RangeMinimumQuery/SchieberVishkinRMQ.h"
 
 inline int min(int a, int b) {
   return std::min(a, b);
