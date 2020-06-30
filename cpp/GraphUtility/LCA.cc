@@ -1,4 +1,5 @@
 #include <vector>
+#include <cstring>
 
 // Schieber-Vishkin algorithm of LCA in O(n) ~ O(1)
 class SchieberVishkinLCA {
@@ -6,8 +7,7 @@ public:
   // order[]: preorder of the vertex in the tree
   // parents[]: direct parent of vertex
   // root: root of the tree
-  void build(const std::vector<int> &order, const std::vector<int> &parents, int root) {
-    const int n = order.size();
+  void build(int n, int order[], int parents[], int root) {
     indices.resize(n);
     ascendant.resize(n);
     head.resize(n);
@@ -67,4 +67,47 @@ private:
   std::vector<uint> inlabel;
   std::vector<uint> ascendant;
   std::vector<int> head;
+};
+
+class BinaryLiftingLCA {
+ public:
+  static const int N = 100000 + 10, POW = 16;
+
+  void dfs(std::vector<int> edges[], int u, int p = -1) {
+    memset(fa[u], -1, sizeof(fa[u]));
+    fa[u][0] = p;
+    dep[u] = p == -1 ? 0 : dep[p] + 1;
+    for (auto &&v: edges[u]) dfs(edges, v, u);
+  }
+
+  void build(int n, int root, std::vector<int> edges[]) {
+    dfs(edges, root);
+    for (int i = 1; (1 << i) <= n; ++i) {
+      for (int j = 0; j < n; ++j) if (~fa[j][i - 1]) {
+        fa[j][i] = fa[fa[j][i - 1]][i - 1];
+      }
+    }
+  }
+
+  int up(int u, int d) {
+    for (int i = 0; d; ++i, d >>= 1) {
+      if (d & 1) u = fa[u][i];
+    }
+    return u;
+  }
+
+  int ask(int u, int v) {
+    if (dep[u] < dep[v]) std::swap(u, v);
+    u = up(u, dep[u] - dep[v]);
+    for (int i = POW; i >= 0; --i) {
+      if (fa[u][i] == fa[v][i]) continue;
+      u = fa[u][i];
+      v = fa[v][i];
+    }
+    if (u != v) u = fa[u][0];
+    return u;
+  }
+
+ private:
+  int fa[N][POW + 1], dep[N];
 };

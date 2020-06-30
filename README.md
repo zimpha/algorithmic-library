@@ -1,58 +1,63 @@
-Collections of some commonly used algorithms.
+# Algorithmic Library: collections of some commonly used algorithms.
+
+Most of the codes are tested against random tests in local. See [README](tests/README.md) in tests directory for more details.
+
+Currently, only C++ version and link-cut-tree in rust version are available. In some day, Java, Python, Dlang version will be added.
 
 ## String Algorithms
 
 + [x] KMP
-+ [x] 扩展KMP
-+ [x] 最小表示法
-+ [x] manacher
-+ [x] 字符串hash
-+ [x] EERTREE
-+ [x] 后缀数组
++ [x] Z algorithm
++ [x] Lexicographically minimal string rotation
++ [x] Manacher's Algorithm
++ [x] Rolling hash
++ [x] EERTREE (also Palindromic Tree)
++ [x] Suffix Array
   + [x] Prefix Doubling
   + [x] SA-IS
-+ [x] 后缀树
-+ [x] 后缀自动机
-+ [x] 子序列自动机
-+ [x] AC自动机
++ [x] Suffix Tree
++ [x] Suffix Automata
++ [x] Subsequence Automata
++ [x] Aho-Corasick Automata
 + [x] Palindromic Factorization
 + [x] Lyndon Word Factorization
 + [ ] Square Factorization
 + [x] Lempel-Ziv Factorization
-+ [ ] Repetitions
-+ [x] CLCS
-+ [x] bit-LCS
++ [ ] Square, Cube, Runs, 
++ [x] Cyclic Longest Common Subsequence (CLCS)
++ [x] Bit-String Longest Common Subsequence LCS Algorithm
++ [ ] Symmetric Compact Directed Acyclic Word Graphs (SCDAWG)
 
 ## Graph Algorithms
 
-+ [x] [拓扑排序](graph-utility/TopoSort.cc)
-+ [x] 最短路
-  + [x] [Floyd/无向图最小环](graph-utility/Floyd.cc)
-  + [x] [Dijkstra](graph-utility/shortest-path.cc)
-  + [x] [SPFA](graph-utility/shortest-path.cc)
-+ [ ] 生成树
++ [x] [Topological Ordering](cpp/GraphUtility/TopoSort.cc)
++ [x] Shortest Path
+  + [x] [Floyd/无向图最小环](cpp/GraphUtility/Floyd.cc)
+  + [x] [Dijkstra](cpp/GraphUtility/shortest-path.cc)
+  + [x] [SPFA](cpp/GraphUtility/shortest-path.cc)
++ [ ] Spanning Tree
   + [ ] Prim
   + [ ] Kruskal
   + [ ] Borůvka
-  + [ ] 度限制最小生成树
-  + [x] [最小树形图](graph-utility/Edmonds.cc)
+  + [ ] Minimum Degree-constrained Spanning Tree
+  + [x] [最小树形图](cpp/GraphUtility/Edmonds.cc)
   + [ ] 次小生成树
   + [ ] Matrix Tree Theorem
-+ [x] [最大流](graph-utility/NetworkFlow.cc)
-+ [x] [费用流](graph-utility/CostFlow.cc)
-+ [x] [Dominator Tree](graph-utility/DominatorTree.cc)
-+ [x] 二分图匹配
-  + [x] [匈牙利算法](graph-utility/Hungarian.cc)
-  + [x] [Hopcroft](graph-utility/Hopcroft.cc)
-  + [x] [Kuhn-Munkres算法](graph-utility/KuhnMunkres.cc)
-+ [ ] 一般图匹配
-  + [x] [最大匹配](graph-utility/Blossom.cc)
-  + [ ] 最大权匹配
-+ [x] [2-SAT](graph-utility/TwoSat.cc)
-+ [x] [有向图强联通分量](graph-utility/SCC.cc)
-+ [x] [无向图割点/割边](graph-utility/ArticulationPoints.cc)
-+ [x] [弦图判定](graph-utility/ChordalGraph.cc)
-+ [x] [图的绝对中心](graph-utility/KarivHakimi.cc)
++ [x] [最大流](cpp/GraphUtility/NetworkFlow.cc)
++ [x] [费用流](cpp/GraphUtility/CostFlow.cc)
++ [x] [Dominator Tree](cpp/GraphUtility/DominatorTree.cc)
++ [x] Bipartite Matching 
+  + [x] [Hungarian Algorithm](cpp/GraphUtility/Hungarian.cc)
+  + [x] [Hopcroft-Karp Algorithm](cpp/GraphUtility/Hopcroft.cc)
+  + [x] [Kuhn-Munkres Algorithm](cpp/GraphUtility/KuhnMunkres.cc)
++ [ ] General Graph Matching
+  + [x] [Maximum Cardinality Matching](cpp/GraphUtility/Blossom.cc)
+  + [ ] Maximum Weight Matching
++ [x] [2-SAT](cpp/GraphUtility/TwoSat.cc)
++ [x] [Strongly Connected Components](cpp/GraphUtility/SCC.cc)
++ [x] [Articulation Points/Bridges](gcpp/GraphUtility/ArticulationPoints.cc)
++ [x] [Chordal Graph](cpp/GraphUtility/ChordalGraph.cc)
++ [x] [Absolute Center of Network](cpp/GraphUtility/KarivHakimi.cc)
 + [ ] Pseudoforest
 + [ ] Cactus Graph
 + [ ] 欧拉回路
@@ -60,7 +65,7 @@ Collections of some commonly used algorithms.
 + [ ] 最近公共祖先
 + [ ] Prüfer序列
 + [ ] 最大团
-+ [x] [全局最小割](graph-utility/StoerWagner.cc)
++ [x] [Stoer Wagner algorithm](cpp/GraphUtility/StoerWagner.cc)
 + [ ] Gomory-Hu tree
 + [ ] 树hash
 + [ ] 树上最长路
