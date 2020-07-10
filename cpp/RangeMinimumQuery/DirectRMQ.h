@@ -17,7 +17,8 @@ public:
     buildInnerBlocks(a, n);
   }
 
-  int query(const T *a, int l, int r) const { // [l, r]
+  // return the index of the minimum value in [u, v] in O(1)
+  int query(const T *a, int l, int r) const {
     const auto &table = sparse_table;
     int x = l / block_size + 1, y = r / block_size - 1, z, mask;
     int ret = l;

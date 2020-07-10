@@ -19,7 +19,8 @@ public:
     buildInnerBlocks(a, n);
   }
 
-  int query(const T *a, int l, int r) const { // [l, r]
+  // return the index of the minimum value in [u, v] in O(1)
+  int query(const T *a, int l, int r) const {
     int x = l / block_size, y = r / block_size;
     if (x == y) return query_lookup(l, r);
     int ret = l;

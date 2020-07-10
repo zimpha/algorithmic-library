@@ -4,6 +4,7 @@
 template <class T, class Compare = std::less<T>>
 class OfflineRMQ {
 public:
+  // solve a set of queries for minimum value in [l, r]
   std::vector<T> solve(const std::vector<T> &a, const std::vector<int> &L, const std::vector<int> &R) {
     const int n = a.size(), q = L.size();
     std::vector<int> prev(q), head(n, -1), parent(n, -1);

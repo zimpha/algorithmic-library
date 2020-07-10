@@ -74,12 +74,12 @@ public:
     if (j == hIv) x = v;
     else {
       mask = highbit(ascendant[v] & (j - 1));
-      x = head[(indices[v] & ~mask | (mask + 1)) - 1];
+      x = head[((indices[v] & ~mask) | (mask + 1)) - 1];
     }
     if (j == hIu) y = u;
     else {
       mask = highbit(ascendant[u] & (j - 1));
-      y = head[(indices[u] & ~mask | (mask + 1)) - 1];
+      y = head[((indices[u] & ~mask) | (mask + 1)) - 1];
     }
     return indices[x] < indices[y] ? x : y;
   }

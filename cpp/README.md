@@ -75,6 +75,7 @@
 + [x] [动态凸壳](data-structure/DynamicConvexHull.cc)
 + [ ] 树链剖分
 + [x] [树分治](data-structure/Centroid-Decomposition.cc)
++ [x] [Dynamic Convex Trick](data-structure/DynamicConvexTrick.cc)
 + [ ] 二叉堆
 + [ ] 左偏树
 + [ ] Splay
