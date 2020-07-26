@@ -36,6 +36,9 @@ impl<R: io::BufRead> Scanner<R> {
         self.reader
             .read_line(&mut line)
             .expect("Failed to read line");
+        if line.ends_with('\n') {
+            line.pop();
+        }
         line
     }
 
@@ -44,9 +47,7 @@ impl<R: io::BufRead> Scanner<R> {
         loop {
             loop {
                 match self.buf_iter.next() {
-                    Some(token) => {
-                        res.push(token.parse().ok().expect("Failed parse"))
-                    }
+                    Some(token) => res.push(token.parse().ok().expect("Failed parse")),
                     None => break,
                 }
             }

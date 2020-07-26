@@ -1,6 +1,6 @@
 unstable_features = true
-max_width = 80
-comment_width = 80
+max_width = 100
+comment_width = 100
 wrap_comments = true
 tab_spaces = 4
 trailing_comma = "Vertical"
