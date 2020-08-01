@@ -1,3 +1,7 @@
+use std::usize;
+
+pub const NULL_INDEX: usize = usize::MAX;
+
 pub fn group_by<I, T>(xs: I) -> Vec<(T, usize)>
 where
     I: Iterator<Item = T>,
