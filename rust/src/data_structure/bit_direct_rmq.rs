@@ -68,7 +68,9 @@ impl BitDirectRMQ {
 
     fn query_lookup(&self, x: usize, y: usize) -> usize {
         unsafe {
-            return x + (*self.lookup.get_unchecked(y) >> (x % Self::BLOCK_SIZE)).trailing_zeros() as usize;
+            return x
+                + (*self.lookup.get_unchecked(y) >> (x % Self::BLOCK_SIZE)).trailing_zeros()
+                    as usize;
         }
     }
 
@@ -87,7 +89,8 @@ impl BitDirectRMQ {
         while (1 << height) < self.blocks {
             height += 1;
         }
-        self.table.resize_with(self.blocks * (height + 1), Default::default);
+        self.table
+            .resize_with(self.blocks * (height + 1), Default::default);
         let mut ptr = self.table.as_mut_ptr();
         for idx in 0..self.blocks {
             let mut best_idx = idx * Self::BLOCK_SIZE;
